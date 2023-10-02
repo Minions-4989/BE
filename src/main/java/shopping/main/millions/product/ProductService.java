@@ -1,6 +1,5 @@
 package shopping.main.millions.product;
 
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,6 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
 
-    private final JPAQueryFactory queryFactory;
 
     public ResponseEntity<List<ProductDto>> findAll() {
         // entity -> dto

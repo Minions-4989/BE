@@ -11,5 +11,4 @@ public class MillionsApplication {
     public static void main(String[] args) {
         SpringApplication.run(MillionsApplication.class, args);
     }
-
 }

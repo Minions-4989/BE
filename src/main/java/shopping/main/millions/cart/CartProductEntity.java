@@ -3,20 +3,20 @@ package shopping.main.millions.cart;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shopping.main.millions.product.ProductEntity;
 
 import javax.persistence.*;
 
 @Entity
 @Getter @Setter
 @NoArgsConstructor
-@Table(name = "cart")
-public class CartEntity {
+@Table(name = "cart_product")
+public class CartProductEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "cart_id")
-    private Long cartId;
-    @Column(name = "cart_count")
-    private Integer cartCount;
+    private Long cartProductId;
 
-
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private ProductEntity product;
 }

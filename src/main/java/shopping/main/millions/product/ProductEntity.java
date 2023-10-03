@@ -4,9 +4,11 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shopping.main.millions.cart.CartProductEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter @Setter
 @NoArgsConstructor
@@ -26,6 +28,9 @@ public class ProductEntity {
 
     @Column(name = "product_date")
     private LocalDateTime ProductDate;
+
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
+    private List<CartProductEntity> cartItems;
 
     @Builder
     public ProductEntity(Long productId, String productName, Integer productPrice, LocalDateTime productDate) {

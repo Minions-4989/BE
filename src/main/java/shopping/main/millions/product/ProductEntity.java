@@ -5,18 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter @Setter
 @NoArgsConstructor
 @Table(name = "product")
+@Entity
 public class ProductEntity {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Long productId;
 
@@ -34,6 +32,6 @@ public class ProductEntity {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;
-        ProductDate = productDate;
+        this.ProductDate = productDate;
     }
 }

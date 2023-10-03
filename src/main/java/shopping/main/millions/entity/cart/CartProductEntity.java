@@ -1,9 +1,9 @@
-package shopping.main.millions.cart;
+package shopping.main.millions.entity.cart;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import shopping.main.millions.product.ProductEntity;
+import shopping.main.millions.entity.product.ProductEntity;
 
 import javax.persistence.*;
 

@@ -1,4 +1,4 @@
-package shopping.main.millions.cart;
+package shopping.main.millions.service.cart;
 
 import org.springframework.stereotype.Service;
 

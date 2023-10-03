@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.jwt.dto.CustomUserDetails;
-import shopping.main.millions.repository.memberRepository.MemberRepository;
+import shopping.main.millions.repository.member.MemberRepository;
 
 import javax.transaction.Transactional;
 

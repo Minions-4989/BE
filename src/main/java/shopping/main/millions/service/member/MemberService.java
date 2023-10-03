@@ -12,7 +12,7 @@ import shopping.main.millions.jwt.dto.LoginTokenSaveDto;
 import shopping.main.millions.jwt.dto.Token;
 import shopping.main.millions.jwt.entity.RefreshToken;
 import shopping.main.millions.jwt.repository.JwtRepository;
-import shopping.main.millions.repository.memberRepository.MemberRepository;
+import shopping.main.millions.repository.member.MemberRepository;
 
 import java.util.HashMap;
 import java.util.Map;

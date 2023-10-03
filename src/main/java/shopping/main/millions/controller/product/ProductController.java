@@ -1,15 +1,17 @@
-package shopping.main.millions.product;
+package shopping.main.millions.controller.product;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import shopping.main.millions.dto.product.ProductDto;
+import shopping.main.millions.service.product.ProductService;
 
-import java.util.List;
-
+@Log4j2
 @RestController
 @RequestMapping("/product")
 @RequiredArgsConstructor

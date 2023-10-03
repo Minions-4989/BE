@@ -1,4 +1,4 @@
-package shopping.main.millions.product;
+package shopping.main.millions.dto.product;
 
 import lombok.Builder;
 import lombok.Getter;

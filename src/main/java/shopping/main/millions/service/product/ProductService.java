@@ -1,10 +1,13 @@
-package shopping.main.millions.product;
+package shopping.main.millions.service.product;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import shopping.main.millions.dto.product.ProductDto;
+import shopping.main.millions.entity.product.ProductEntity;
+import shopping.main.millions.repository.product.ProductRepository;
 
 import java.util.Optional;
 

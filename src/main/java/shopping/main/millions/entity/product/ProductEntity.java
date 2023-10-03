@@ -1,10 +1,10 @@
-package shopping.main.millions.product;
+package shopping.main.millions.entity.product;
 
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import shopping.main.millions.cart.CartProductEntity;
+import shopping.main.millions.entity.cart.CartProductEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;

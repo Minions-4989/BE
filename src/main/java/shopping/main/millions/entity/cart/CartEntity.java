@@ -1,4 +1,4 @@
-package shopping.main.millions.cart;
+package shopping.main.millions.entity.cart;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

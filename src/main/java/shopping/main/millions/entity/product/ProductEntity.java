@@ -24,7 +24,7 @@ public class ProductEntity {
     private String productName;
 
     @Column(name = "product_price")
-    private Integer productPrice;
+    private String productPrice;
 
     @Column(name = "product_date")
     private LocalDateTime ProductDate;
@@ -33,7 +33,7 @@ public class ProductEntity {
     private List<CartProductEntity> cartProductEntityList;
 
     @Builder
-    public ProductEntity(Long productId, String productName, Integer productPrice, LocalDateTime productDate) {
+    public ProductEntity(Long productId, String productName, String productPrice, LocalDateTime productDate) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;

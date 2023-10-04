@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import shopping.main.millions.entity.cart.CartProductEntity;
+import shopping.main.millions.entity.category.CategoryEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -31,6 +32,10 @@ public class ProductEntity {
 
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
     private List<CartProductEntity> cartProductEntityList;
+
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private CategoryEntity categoryEntity;
 
     @Builder
     public ProductEntity(Long productId, String productName, String productPrice, LocalDateTime productDate) {

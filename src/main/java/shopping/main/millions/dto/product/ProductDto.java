@@ -15,12 +15,12 @@ public class ProductDto {
 
     private String productName;
 
-    private Integer productPrice;
+    private String productPrice;
 
     private LocalDateTime productDate;
 
     @Builder
-    public ProductDto(Long productId, String productName, Integer productPrice, LocalDateTime productDate) {
+    public ProductDto(Long productId, String productName, String productPrice, LocalDateTime productDate) {
         this.productId = productId;
         this.productName = productName;
         this.productPrice = productPrice;

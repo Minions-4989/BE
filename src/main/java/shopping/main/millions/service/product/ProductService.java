@@ -48,16 +48,32 @@ public class ProductService {
     public ResponseEntity<ProductDto> findProductById(Long id) {
         // productId에 해당하는　productEntity 가져오기
         Optional<ProductEntity> byId = productRepository.findById(id);
-        ProductEntity productEntity = byId.get();
-        // entity -> dto
-        ProductDto productDTO = ProductDto
-                .builder()
-                .productId(productEntity.getProductId())
-                .productName(productEntity.getProductName())
-                .productPrice(productEntity.getProductPrice())
-                .productDate(productEntity.getProductDate())
-                .build();
 
-        return ResponseEntity.status(200).body(productDTO);
+        if(byId.isPresent()) {
+            ProductEntity productEntity = byId.get();
+
+            // entity -> dto
+            ProductDto productDTO = ProductDto
+                    .builder()
+                    .productId(productEntity.getProductId())
+                    .productName(productEntity.getProductName())
+                    .productPrice(productEntity.getProductPrice())
+                    .productDate(productEntity.getProductDate())
+                    .build();
+
+            return ResponseEntity.status(200).body(productDTO);
+        }
+        return ResponseEntity.status(200).body(null);
+    }
+
+    public Page<ProductDto> getProductsByCategory(Pageable pageable, Long categoryId) {
+        Page<ProductEntity> products = productRepository.findAllByCategoryEntityOrderByProductId(categoryId,pageable);
+        Page<ProductDto> productDto = products.map(product -> ProductDto.builder()
+                .productId(product.getProductId())
+                .productName(product.getProductName())
+                .productPrice(product.getProductPrice())
+                .productDate(product.getProductDate())
+                .build());
+        return productDto;
     }
 }

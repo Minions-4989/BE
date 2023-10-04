@@ -17,6 +17,9 @@ public class CartProductEntity {
     @Column(name = "cart_product_id")
     private Long cartProductId;
 
+    @Column(name = "cart_product_count")
+    private Long cartProductCount;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;

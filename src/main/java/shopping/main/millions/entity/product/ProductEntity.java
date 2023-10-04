@@ -29,8 +29,8 @@ public class ProductEntity {
     @Column(name = "product_date")
     private LocalDateTime ProductDate;
 
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL)
-    private List<CartProductEntity> cartItems;
+    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
+    private List<CartProductEntity> cartProductEntityList;
 
     @Builder
     public ProductEntity(Long productId, String productName, Integer productPrice, LocalDateTime productDate) {

@@ -1,6 +1,7 @@
 package shopping.main.millions.entity.member;
 
 import lombok.*;
+import shopping.main.millions.entity.cart.CartEntity;
 
 import javax.persistence.*;
 
@@ -33,5 +34,9 @@ public class MemberEntity {
     private String gender;
     @Column(name = "profile_image")
     private String profileImage;
+
+    @OneToOne(fetch=FetchType.EAGER)
+    @JoinColumn(name = "cart_id")
+    private CartEntity cartEntity;
 
 }

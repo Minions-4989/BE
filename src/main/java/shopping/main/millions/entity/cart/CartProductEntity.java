@@ -14,9 +14,14 @@ import javax.persistence.*;
 public class CartProductEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "cart_product_id")
     private Long cartProductId;
 
     @ManyToOne
     @JoinColumn(name = "product_id")
-    private ProductEntity product;
+    private ProductEntity productEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    private CartEntity cartEntity;
 }

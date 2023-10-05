@@ -6,6 +6,7 @@ import shopping.main.millions.entity.product.ProductEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Entity
 @Getter @Setter
@@ -31,9 +32,22 @@ public class CartProductEntity {
     private CartEntity cartEntity;
 
     public CartProductEntity convertToEntity(CartProductDto cartProductDto) {
+        //CartProductDto 내에 있는 List<Option>을 하나씩 정의해주는 과정
+        List<CartProductDto.Option> options = cartProductDto.getOption();
+        String productSize = null;
+        Long productCount = null;
+        String productColor = null;
+        for (CartProductDto.Option option : options) {
+            productSize = option.getProductSize();
+            productCount = option.getProductCount();
+            productColor = option.getProductColor();
+        }
+
         return CartProductEntity.builder()
-                .cartProductId(cartProductDto.getCartProductId())
-                .cartProductCount(cartProductDto.getCartProductCount())
+                .cartProductId(cartProductDto.getProductId())
+                .cartProductCount(productCount)
+                .cartProductSize(productSize)
+                .cartProductColor(productColor)
                 .build();
     }
 }

@@ -29,13 +29,13 @@ public class ProductController {
     }
 
     //상품 상세 조회
-    @GetMapping("/list/productId={productId}")
+    @GetMapping("/detail/{productId}")
     public ResponseEntity<ProductDto> searchProductById(@PathVariable Long productId) {
         return productService.findProductById(productId);
     }
 
     //카테고리별 조회
-    @GetMapping("/list/categoryId={categoryId}")
+    @GetMapping("/category/{categoryId}")
     public ResponseEntity<Page<ProductDto>> searchProductByCategory(@PageableDefault(page= 0, size = 10, sort = "productId", direction = Sort.Direction.ASC)
                                                                   Pageable pageable, @PathVariable Long categoryId) {
         Page<ProductDto> products = productService.getProductsByCategory(pageable,categoryId);

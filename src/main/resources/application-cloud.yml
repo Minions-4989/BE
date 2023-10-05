@@ -7,3 +7,4 @@ cloud:
       static: ${cloud.aws.region.static}
     s3:
       bucket : ${cloud.aws.s3.bucket}
+      goods-bucket : ${cloud.aws.s3.goods-bucket}

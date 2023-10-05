@@ -2,6 +2,7 @@ package shopping.main.millions.entity.product;
 
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import shopping.main.millions.entity.product.ProductEntity;
 
 import javax.persistence.*;
@@ -9,7 +10,8 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "stock")
-@Getter @Setter
+@Getter
+@SuperBuilder
 //재고 테이블
 public class GoodsStockEntity {
 

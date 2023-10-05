@@ -1,29 +1,22 @@
 package shopping.main.millions.dto.product;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.joda.time.DateTime;
 
 import java.time.LocalDateTime;
 
-@Getter @Setter
+@Getter
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class ProductDto {
 
     private Long productId;
 
     private String productName;
 
-    private String productPrice;
+    private Integer productPrice;
 
-    private LocalDateTime productDate;
+    private DateTime productDate;
 
-    @Builder
-    public ProductDto(Long productId, String productName, String productPrice, LocalDateTime productDate) {
-        this.productId = productId;
-        this.productName = productName;
-        this.productPrice = productPrice;
-        this.productDate = productDate;
-    }
 }

@@ -1,11 +1,11 @@
 package shopping.main.millions.entity.product;
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.joda.time.DateTime;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.category.CategoryEntity;
+import shopping.main.millions.repository.sales.GoodsEditRepository;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -14,6 +14,11 @@ import java.util.List;
 @Getter @Setter
 @NoArgsConstructor
 @Entity
+@AllArgsConstructor
+@SuperBuilder // 나중에 알아보기
+// @Builder 는 상속받은 필드는 사용못함
+// @SuperBuilder 는 그걸 보완하기위해서 나온것 근데 설명보니 자식 클래스하고 부모클래스 양쪽에 해야된다는데
+// 제가 궁금한게 상속이면 extends인데 전 extends를 repository에서 밖에 안썻는데
 @Table(name = "product")
 public class ProductEntity {
 
@@ -22,13 +27,13 @@ public class ProductEntity {
     private Long productId;
 
     @Column(name = "product_name")
-    private String productName;
+    private String productName; // 상품이름
 
     @Column(name = "product_price")
-    private String productPrice;
+    private Integer productPrice; //상품가격
 
     @Column(name = "product_date")
-    private LocalDateTime ProductDate;
+    private DateTime productDate; //판매가능날짜
 
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
     private List<CartProductEntity> cartProductEntityList;

@@ -7,7 +7,9 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shopping.main.millions.dto.cart.CartProductDto;
+import shopping.main.millions.dto.product.ProductDto;
 import shopping.main.millions.entity.cart.CartEntity;
+import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.repository.cart.CartProductRepository;
@@ -53,5 +55,11 @@ public class CartService {
 //        }
 //
 //    }
+
+    public Page<CartProductDto> getCartProductsByPage(Pageable pageable) {
+//        Page<CartProductEntity> cartProducts = cartProductRepository.findAll(pageable);
+//        return cartProducts.map(this::CartProductDto.convertToDto);
+        return null;
+    }
 
 }

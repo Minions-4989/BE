@@ -2,7 +2,6 @@ package shopping.main.millions.entity.product;
 
 
 import lombok.*;
-import shopping.main.millions.entity.product.ProductEntity;
 
 import javax.persistence.*;
 

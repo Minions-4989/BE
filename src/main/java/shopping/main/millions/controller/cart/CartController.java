@@ -10,6 +10,7 @@ import org.springframework.http.HttpRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shopping.main.millions.dto.cart.CartProductDto;
+import shopping.main.millions.dto.product.ProductDto;
 import shopping.main.millions.service.cart.CartService;
 
 import java.net.http.HttpResponse;
@@ -33,7 +34,9 @@ public class CartController {
 
     //장바구니 조회
     @GetMapping("/")
-    public ResponseEntity<CartProductDto> viewCart(){
-        return  null;
+    public ResponseEntity<Page<CartProductDto>> viewCartProductListByPage (@PageableDefault(page= 0, size = 10, sort = "cartProductId", direction = Sort.Direction.ASC)
+                                                                   Pageable pageable){
+        Page<CartProductDto> products = cartService.getCartProductsByPage(pageable);
+        return ResponseEntity.ok(products);
     }
 }

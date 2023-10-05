@@ -26,6 +26,9 @@ public class CartEntity {
     private List<CartProductEntity> cartProductEntityList;
 
 
-
-
+//    public static CartEntity createCart(MemberEntity memberEntity) {
+//        CartEntity cartEntity = new CartEntity();
+//        cartEntity.setMemberEntity(memberEntity);
+//        return cartEntity;
+//    }
 }

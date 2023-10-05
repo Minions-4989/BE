@@ -28,6 +28,7 @@ public class GoodsStockEntity {
     private String stockColor; // 색상
 
     // Many To One 으로 product랑 연관관계
+    //연관
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;

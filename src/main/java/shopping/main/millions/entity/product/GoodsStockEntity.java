@@ -1,9 +1,10 @@
 package shopping.main.millions.entity.product;
 
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import shopping.main.millions.entity.product.ProductEntity;
 
 import javax.persistence.*;
 
@@ -20,13 +21,13 @@ public class GoodsStockEntity {
     @Column(name = "stock_id")
     private Long stockId;       //stock
 
-    @Column(name = "stock_quantity" , nullable = false)
+    @Column(name = "stock_quantity", nullable = false)
     private Long stockQuantity; //수량
 
-    @Column(name = "stock_size" , nullable = false , length = 10)
+    @Column(name = "stock_size", nullable = false, length = 10)
     private String stockSize; // 사이즈
 
-    @Column(name = "stock_color" , nullable = false)
+    @Column(name = "stock_color", nullable = false)
     private String stockColor; // 색상
 
     // Many To One 으로 product랑 연관관계

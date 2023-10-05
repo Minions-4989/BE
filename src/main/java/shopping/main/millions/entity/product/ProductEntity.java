@@ -1,17 +1,19 @@
 package shopping.main.millions.entity.product;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import org.joda.time.DateTime;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.category.CategoryEntity;
-import shopping.main.millions.repository.sales.GoodsEditRepository;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter @Setter
+@Getter
+@Setter
 @NoArgsConstructor
 @Entity
 @AllArgsConstructor
@@ -22,7 +24,8 @@ import java.util.List;
 @Table(name = "product")
 public class ProductEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "product_id")
     private Long productId;
 
@@ -38,28 +41,19 @@ public class ProductEntity {
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
     private List<CartProductEntity> cartProductEntityList;
 
-    @OneToMany(mappedBy = "ProductEntity" , cascade = CascadeType.REMOVE , orphanRemoval = true , fetch = FetchType.LAZY)
-    private List<GoodsStockEntity> goodsStockEntityList; //재고가 왜 oneToone이죠? erd가 그러길래.. oneToMany
+    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<GoodsStockEntity> goodsStockEntityList;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryEntity categoryEntity; // 카테고리
-    //private final GoodsEditRepository goodsEditRepository;
-    // 이런걸 쓰는이유가 무엇일가영 goodsEditRepository를 사용하기 위해서
-    // 저걸 무슨방식이라고 할까영?아 생성자 주입방식이라고 합니다 아하
-    // @Autowired = 필드주입방식식 네 자동으로 인식해서 주입해준다고
-    // 생성자 주입을 쓰는걸 권장하기에 그렇게 쓰고있는^^
-    // builder 저렇게 안쓰고 그냥 전에 하시던 아래다가 적는거로 하셔도되영ㅎ_ㅎ
-    //아하 superBuilder를 사용 함으로써 서로 extends를 해준다는게 신기하네요 그러면 저는
-    // 아 슈퍼빌드를 사용 함으로써 여러개의 엔티티를 한번에 빌드를 세울 수 있다는 뜻인가요 ?
-    //이걸 상속받아서 쓰고있죵? 꼭 extends 를 안써도 다른 .java 파일에서 가져온 것을 쓰는게 상속이라는거네요 ?
-    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL) // 물건을 없애면 이미지도 날라가는거야 으이 !
+
+
+    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
     private List<GoodsImageEntity> goodsImageEntity;
     // May To One 으로 재고테이블 연관관계
 
 }
-
-
 
 
 //여기에 합치고

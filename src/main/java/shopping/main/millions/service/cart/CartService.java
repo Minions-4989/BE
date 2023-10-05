@@ -20,7 +20,18 @@ public class CartService {
     private final MemberRepository memberRepository;
     private final CartRepository cartRepository;
     private final CartProductRepository cartProductRepository;
-//
+
+    public ResponseEntity<Map<String, String>> addCart(CartProductDto cartProductDto) {
+//        for (CartProductDto cartProductDto : cartProductDto) {
+//            System.out.println("Product ID: " + cartProductDto.getProductId());
+//            System.out.println("Product Size: " + cartProductDto.getProductSize());
+//            System.out.println("Product Color: " + cartProductDto.getProductColor());
+//            System.out.println("Product Count: " + cartProductDto.getProductCount());
+//            System.out.println(); // 개별 제품 간에 빈 줄 삽입
+//        }
+        return null;
+    }
+
 //    public Long addCart(CartProductDto cartProductDto, Long userId){
 //        ProductEntity productEntity = productRepository.findById(cartProductDto.getCartProductId())
 //                .orElseThrow(EntityNotFoundException::new);

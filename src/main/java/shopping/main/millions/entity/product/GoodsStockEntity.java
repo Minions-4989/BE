@@ -5,6 +5,9 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import lombok.*;
+
+import shopping.main.millions.entity.product.ProductEntity;
 
 import javax.persistence.*;
 

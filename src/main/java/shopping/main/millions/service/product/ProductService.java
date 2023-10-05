@@ -16,24 +16,6 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
 
-//    public ResponseEntity<List<ProductDto>> findAll() {
-//        // entity -> dto
-//        List<ProductEntity> productList = productRepository.findAll();
-//        List<ProductDto> productDTOList = new ArrayList<>();
-//        for (ProductEntity productEntity : productList) {
-//            ProductDto productDTO = ProductDto
-//                    .builder()
-//                    .productId(productEntity.getProductId())
-//                    .productName(productEntity.getProductName())
-//                    .productPrice(productEntity.getProductPrice())
-//                    .productDate(productEntity.getProductDate())
-//                    .build();
-//            productDTOList.add(productDTO);
-//        }
-//
-//        return ResponseEntity.status(200).body(productDTOList);
-//    }
-
     public Page<ProductDto> getProductsByPage(Pageable pageable) {
         Page<ProductEntity> products = productRepository.findAll(pageable);
         Page<ProductDto> productDto = products.map(product -> ProductDto.builder()

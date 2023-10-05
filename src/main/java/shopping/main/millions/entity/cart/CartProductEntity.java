@@ -23,6 +23,12 @@ public class CartProductEntity {
     @Column(name = "cart_product_count")
     private Long cartProductCount;
 
+    @Column(name = "cart_product_size")
+    private String cartProductSize;
+
+    @Column(name = "cart_product_color")
+    private String cartProductColor;
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;

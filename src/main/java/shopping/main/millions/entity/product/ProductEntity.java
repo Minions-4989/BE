@@ -16,10 +16,9 @@ import shopping.main.millions.entity.order.OrderEntity;
 import shopping.main.millions.repository.sales.GoodsEditRepository;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.List;
 
-@Getter
+@Getter @Setter
 @NoArgsConstructor
 @Entity
 @AllArgsConstructor

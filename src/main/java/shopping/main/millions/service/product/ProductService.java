@@ -45,7 +45,7 @@ public class ProductService {
         return productDto;
     }
 
-    public ResponseEntity<ProductDto> findProductById(Long id) {
+    public ResponseEntity<?> findProductById(Long id) {
         // productId에 해당하는　productEntity 가져오기
         Optional<ProductEntity> byId = productRepository.findById(id);
 
@@ -62,8 +62,10 @@ public class ProductService {
                     .build();
 
             return ResponseEntity.status(200).body(productDTO);
+        }else{
+            return ResponseEntity.status(400).body("상품이 없습니다");
+
         }
-        return ResponseEntity.status(200).body(null);
     }
 
     public Page<ProductDto> getProductsByCategory(Pageable pageable, Long categoryId) {

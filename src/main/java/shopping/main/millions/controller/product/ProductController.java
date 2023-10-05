@@ -30,7 +30,7 @@ public class ProductController {
 
     //상품 상세 조회
     @GetMapping("/detail/{productId}")
-    public ResponseEntity<ProductDto> searchProductById(@PathVariable Long productId) {
+    public ResponseEntity<?> searchProductById(@PathVariable Long productId) {
         return productService.findProductById(productId);
     }
 

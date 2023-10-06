@@ -24,13 +24,7 @@ import java.util.Map;
 public class CartController {
 
     private final CartService cartService;
-
-    //상품 장바구니에 추가
-    @PostMapping("/add")
-    public ResponseEntity<Map<String,String>> addProductToCart(@RequestBody CartProductDto cartProductDto){
-
-        return cartService.addCart(cartProductDto);
-    }
+    private final TokenProvider tokenProvider;
 
     //장바구니 조회
     @GetMapping("/")

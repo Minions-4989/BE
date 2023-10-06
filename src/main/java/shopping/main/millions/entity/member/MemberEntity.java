@@ -5,6 +5,7 @@ import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.service.cart.CartService;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor

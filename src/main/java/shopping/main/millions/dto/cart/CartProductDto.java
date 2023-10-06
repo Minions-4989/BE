@@ -1,5 +1,6 @@
 package shopping.main.millions.dto.cart;
 
+import com.sun.istack.NotNull;
 import lombok.*;
 import shopping.main.millions.dto.sales.GoodsImageDto;
 import shopping.main.millions.entity.product.GoodsImageEntity;

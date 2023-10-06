@@ -8,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 import org.joda.time.DateTime;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.category.CategoryEntity;
+import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.repository.sales.GoodsEditRepository;
 
 import javax.persistence.*;
@@ -15,7 +16,6 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @Entity
 @AllArgsConstructor
@@ -51,5 +51,9 @@ public class ProductEntity {
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
     private List<GoodsImageEntity> goodsImageEntity;
     // May To One 으로 재고테이블 연관관계
+
+    @ManyToOne
+    @JoinColumn(name="user_id")
+    private MemberEntity memberEntity; //나의 판매물품 조회를 위한 유저 연관관계
 
 }

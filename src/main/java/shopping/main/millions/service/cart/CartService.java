@@ -8,12 +8,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shopping.main.millions.dto.cart.CartProductDto;
 import shopping.main.millions.dto.product.ProductDto;
-import shopping.main.millions.entity.cart.CartEntity;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.repository.cart.CartProductRepository;
-import shopping.main.millions.repository.cart.CartRepository;
 import shopping.main.millions.repository.member.MemberRepository;
 import shopping.main.millions.repository.product.ProductRepository;
 
@@ -26,7 +24,6 @@ import java.util.Map;
 public class CartService {
     private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
-    private final CartRepository cartRepository;
     private final CartProductRepository cartProductRepository;
 
     public ResponseEntity<Map<String, String>> addCart(CartProductDto cartProductDto) {

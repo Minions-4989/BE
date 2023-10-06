@@ -1,9 +1,11 @@
 package shopping.main.millions.entity.member;
 
 import lombok.*;
-import shopping.main.millions.entity.cart.CartEntity;
+import shopping.main.millions.entity.cart.CartProductEntity;
+import shopping.main.millions.entity.product.ProductEntity;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @AllArgsConstructor
@@ -35,8 +37,11 @@ public class MemberEntity {
     @Column(name = "profile_image")
     private String profileImage;
 
-    @OneToOne(fetch=FetchType.EAGER)
-    @JoinColumn(name = "cart_id")
-    private CartEntity cartEntity;
+    @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    private List<CartProductEntity> cartProductEntityList;
+
+    @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    private List<ProductEntity> productEntityList;
+
 
 }

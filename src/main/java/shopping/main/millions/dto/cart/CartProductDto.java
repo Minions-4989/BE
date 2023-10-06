@@ -2,10 +2,10 @@ package shopping.main.millions.dto.cart;
 
 import com.sun.istack.NotNull;
 import lombok.*;
-import shopping.main.millions.entity.cart.CartEntity;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 
 @Getter
@@ -19,13 +19,13 @@ public class CartProductDto {
     private Long productId;
     private List<Option> option;
 
-    @Getter
-    @Setter
-    public static class Option{
-        private String productSize;
-        private String productColor;
-        private Long productCount;
-    }
+//    @Getter
+//    @Setter
+//    public static class Option{
+//        private String productSize;
+//        private String productColor;
+//        private Long productCount;
+//    }
 
 
     public CartProductDto convertToDto(CartProductEntity cartProductEntity) {

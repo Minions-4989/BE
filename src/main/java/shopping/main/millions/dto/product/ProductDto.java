@@ -4,6 +4,7 @@ import lombok.*;
 import org.joda.time.DateTime;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @NoArgsConstructor
@@ -17,6 +18,6 @@ public class ProductDto {
 
     private Integer productPrice;
 
-    private DateTime productDate;
+    private Date productDate;
 
 }

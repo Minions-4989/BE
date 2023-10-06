@@ -33,7 +33,7 @@ public class CartService {
     private final GoodsStockRepository goodsStockRepository;
     private final Logger log = LoggerFactory.getLogger(this.getClass().getSimpleName());
 
-
+    //물품 장바구니 담기
     public ResponseEntity<Map<String, String>> addCart(CartProductDto cartProductDto) {
         Map<String, String> map = new HashMap<>();
         List<OptionDto> optionList = cartProductDto.getOption();

@@ -26,37 +26,25 @@ public class CartService {
     private final MemberRepository memberRepository;
     private final CartProductRepository cartProductRepository;
 
-    public ResponseEntity<Map<String, String>> addCart(CartProductDto cartProductDto) {
-//        for (CartProductDto cartProductDto : cartProductDto) {
-//            System.out.println("Product ID: " + cartProductDto.getProductId());
-//            System.out.println("Product Size: " + cartProductDto.getProductSize());
-//            System.out.println("Product Color: " + cartProductDto.getProductColor());
-//            System.out.println("Product Count: " + cartProductDto.getProductCount());
-//            System.out.println(); // 개별 제품 간에 빈 줄 삽입
-//        }
-        return null;
-    }
+    public ResponseEntity<?> CartProductList(String userId) {
+        List<CartProductEntity> cartProducts = cartProductRepository.findCartProductEntityByMemberEntity_UserId(Long.valueOf(userId));
+        List<CartProductDto> cartProductDtoList = new ArrayList<>();
 
-//    public Long addCart(CartProductDto cartProductDto, Long userId){
-//        ProductEntity productEntity = productRepository.findById(cartProductDto.getCartProductId())
-//                .orElseThrow(EntityNotFoundException::new);
-//        MemberEntity memberEntity = memberRepository.findByUserEmail(userId); //타입이 달라서그런거같아여
-//        //이거보다는 사용자 정보에 userId 숫자타입이 들어있을거거든여 위에 email 말구여ㅛㅇ?
-//        //넹 그래서 사용자 아이디를 이용해서 장바구니id를 먼저 조회하고
-//        //
-//        CartEntity cartEntity = cartRepository.findByMemberId(memberEntity.getUserId());
-//        if (cartEntity == null){
-//            cartEntity = CartEntity.createCart(memberEntity);
-//
-//
-//        }
-//
-//    }
-
-    public Page<CartProductDto> getCartProductsByPage(Pageable pageable) {
-//        Page<CartProductEntity> cartProducts = cartProductRepository.findAll(pageable);
-//        return cartProducts.map(this::CartProductDto.convertToDto);
-        return null;
+        for (CartProductEntity cartProductEntity : cartProducts) {
+            CartProductDto dto = new CartProductDto().builder()
+                    .userId(cartProductEntity.getMemberEntity().getUserId())
+                    .productId(cartProductEntity.getProductEntity().getProductId())
+                    .cartProductId(cartProductEntity.getCartProductId())
+                    .cartProductCount(cartProductEntity.getCartProductCount())
+                    .cartProductSize(cartProductEntity.getCartProductSize())
+                    .cartProductColor(cartProductEntity.getCartProductColor())
+                    .productPrice(cartProductEntity.getProductEntity().getProductPrice())
+                    .productName(cartProductEntity.getProductEntity().getProductName())
+                    .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
+                    .build();
+            cartProductDtoList.add(dto);
+        }
+        return ResponseEntity.status(200).body(cartProductDtoList);
     }
 
 }

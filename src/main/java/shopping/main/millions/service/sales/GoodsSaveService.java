@@ -71,21 +71,26 @@ public class GoodsSaveService {
     public ResponseEntity<Map<String, String>> editItem(GoodsSaveDto goodsSaveDto, List<MultipartFile> imageFile) {
 
         List<String> goodsImgFile = new ArrayList<>();
-        for (MultipartFile multipartFile : goodsSaveDto.getImageFile()) {
+        for (MultipartFile multipartFile : imageFile) {
 
-            String fileName = createFileName(multipartFile.getOriginalFilename());
-            ObjectMetadata objectMetadata = new ObjectMetadata();
-            objectMetadata.setContentLength(multipartFile.getSize());
-            objectMetadata.setContentType(multipartFile.getContentType());
+            String fileName = multipartFile.getOriginalFilename();
 
-            try (InputStream inputStream = multipartFile.getInputStream()) {
-                amazonS3Client.putObject(new PutObjectRequest(bucketName, fileName, inputStream, objectMetadata)
-                        .withCannedAcl(CannedAccessControlList.PublicRead));
+            try {
+                ObjectMetadata objectMetadata = new ObjectMetadata();
+                objectMetadata.setContentType(multipartFile.getContentType());
+                objectMetadata.setContentLength(multipartFile.getInputStream().available());
+                String storedName = createFileName(fileName);
+                amazonS3Client.putObject(bucketName, storedName, multipartFile.getInputStream(), objectMetadata);
+
+                String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
+                System.out.println(accessUrl);
+
             } catch (IOException e) {
-                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "파일 업로드에 실패했습니다.");
+                throw new RuntimeException();
             }
             goodsImgFile.add(fileName);
         }
+
 
         List<GoodsStockEntity> goodsStockEntityList = new ArrayList<>();
         for (StockSaveDto stockSaveDto : goodsSaveDto.getStockOption()) {

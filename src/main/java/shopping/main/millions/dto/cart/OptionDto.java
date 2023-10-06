@@ -3,6 +3,7 @@ package shopping.main.millions.dto.cart;
 import lombok.*;
 
 @Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder

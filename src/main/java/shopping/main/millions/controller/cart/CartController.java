@@ -34,7 +34,7 @@ public class CartController {
 
     //장바구니 조회
     @GetMapping("/")
-    public ResponseEntity<Page<CartProductDto>> viewCartProductListByPage (@PageableDefault(page= 0, size = 10, sort = "cartProductId", direction = Sort.Direction.ASC)
+    public ResponseEntity<?> viewCartProductListByPage (@PageableDefault(page= 0, size = 10, sort = "cartProductId", direction = Sort.Direction.ASC)
                                                                    Pageable pageable){
         Page<CartProductDto> products = cartService.getCartProductsByPage(pageable);
         return ResponseEntity.ok(products);

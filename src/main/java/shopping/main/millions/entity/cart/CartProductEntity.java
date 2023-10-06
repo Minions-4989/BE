@@ -2,6 +2,9 @@ package shopping.main.millions.entity.cart;
 
 import lombok.*;
 import shopping.main.millions.dto.cart.CartProductDto;
+import shopping.main.millions.dto.cart.CartProductInputDto;
+import shopping.main.millions.dto.cart.OptionDto;
+import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 
 import javax.persistence.*;
@@ -9,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "cart_product")
@@ -30,30 +33,22 @@ public class CartProductEntity {
     private String cartProductColor;
 
     @ManyToOne
+    @JoinColumn(name = "user_Id")
+    private MemberEntity memberEntity;
+
+    @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
 
-    @ManyToOne
-    @JoinColumn(name = "cart_id")
-    private CartEntity cartEntity;
 
-    public CartProductEntity convertToEntity(CartProductDto cartProductDto) {
-        //CartProductDto 내에 있는 List<Option>을 하나씩 정의해주는 과정
-        List<CartProductDto.Option> options = cartProductDto.getOption();
-        String productSize = null;
-        Long productCount = null;
-        String productColor = null;
-        for (CartProductDto.Option option : options) {
-            productSize = option.getProductSize();
-            productCount = option.getProductCount();
-            productColor = option.getProductColor();
-        }
+    public CartProductEntity convertToEntity(CartProductInputDto cartProductInputDto) {
 
         return CartProductEntity.builder()
-                .cartProductId(cartProductDto.getProductId())
-                .cartProductCount(productCount)
-                .cartProductSize(productSize)
-                .cartProductColor(productColor)
+                .cartProductCount(cartProductInputDto.getProductCount())
+                .cartProductSize(cartProductInputDto.getProductSize())
+                .cartProductColor(cartProductInputDto.getProductColor())
+                .memberEntity(cartProductInputDto.getMemberEntity())
+                .productEntity(cartProductInputDto.getProductEntity())
                 .build();
     }
 }

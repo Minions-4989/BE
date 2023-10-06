@@ -10,6 +10,7 @@ import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.category.CategoryEntity;
 
 import javax.persistence.*;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -35,7 +36,7 @@ public class ProductEntity {
     private Integer productPrice; //상품가격
 
     @Column(name = "product_date")
-    private DateTime productDate; //판매가능날짜
+    private Date productDate; //판매가능날짜
 
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
     private List<CartProductEntity> cartProductEntityList;

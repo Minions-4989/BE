@@ -4,6 +4,7 @@ package shopping.main.millions.entity.product;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
@@ -11,7 +12,7 @@ import javax.persistence.*;
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "stock")
-@Getter
+@Getter @Setter
 @SuperBuilder
 //재고 테이블
 public class GoodsStockEntity {

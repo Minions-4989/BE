@@ -2,6 +2,7 @@ package shopping.main.millions.entity.member;
 
 import lombok.*;
 import shopping.main.millions.entity.cart.CartProductEntity;
+import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.service.cart.CartService;
 
 import javax.persistence.*;
@@ -39,5 +40,8 @@ public class MemberEntity {
 
     @OneToMany(mappedBy = "memberEntity" , cascade = CascadeType.REMOVE , orphanRemoval = true , fetch = FetchType.LAZY)
     private List<CartProductEntity> cartProductEntityList;
+
+    @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
+    private List<ProductEntity> productEntityList;
 
 }

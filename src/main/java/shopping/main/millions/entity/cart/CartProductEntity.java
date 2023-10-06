@@ -14,6 +14,7 @@ import java.util.List;
 @Entity
 @Getter @Setter
 @NoArgsConstructor
+@ToString //지워야징
 @AllArgsConstructor
 @Table(name = "cart_product")
 @SuperBuilder

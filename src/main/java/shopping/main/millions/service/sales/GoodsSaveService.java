@@ -10,8 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
+import shopping.main.millions.dto.sales.GoodsImageDto;
+import shopping.main.millions.dto.sales.GoodsModifyDto;
 import shopping.main.millions.dto.sales.GoodsSaveDto;
 import shopping.main.millions.dto.sales.StockSaveDto;
 import shopping.main.millions.entity.category.CategoryEntity;
@@ -43,26 +46,30 @@ public class GoodsSaveService {
     private String createFileName(String fileName){
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
     }
+
     // file 형식이 잘못된 경우를 확인하기 위해 만들어진 로직이며, 파일 타입과 상관없이 업로드할 수 있게 하기 위해 .의 존재 유무만 판단하였습니다.
     private String getFileExtension(String filename){
         try {
             return filename.substring(filename.lastIndexOf("."));
-        }catch (StringIndexOutOfBoundsException e){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,"잘못된 형식의 파일("+filename+")입니다.");
+        } catch (StringIndexOutOfBoundsException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "잘못된 형식의 파일(" + filename + ")입니다.");
         }
     }
+
     //진짜 삭제 맨
-    public void deleteFile(String fileName){
-        amazonS3Client.deleteObject(new DeleteObjectRequest(bucketName,fileName));
+    public void deleteFile(String fileName) {
+        amazonS3Client.deleteObject(new DeleteObjectRequest(bucketName, fileName));
     }
+
     /**
      * 2023-10-04
      * 상품 등록
      * 작성자 : 김대한
      */
-    public ResponseEntity<Map<String,String>> editItem(GoodsSaveDto goodsSaveDto) {
-        //여기서 한번 일단 해보시죵?
-        // 해보시고 봐드릴게영^_^
+
+    @Transactional
+    public ResponseEntity<Map<String, String>> editItem(GoodsSaveDto goodsSaveDto, List<MultipartFile> imageFile) {
+
         List<String> goodsImgFile = new ArrayList<>();
         for (MultipartFile multipartFile : goodsSaveDto.getImageFile()) {
 
@@ -92,7 +99,6 @@ public class GoodsSaveService {
 
         //Client에 값을 받은 data를 entity로 변환
         ProductEntity goodsSaveEntity = ProductEntity.builder()
-                .productId(goodsSaveDto.getProductId())
                 .productName(goodsSaveDto.getProductName())
                 .productPrice(goodsSaveDto.getProductPrice())
                 .productDate(goodsSaveDto.getProductDate())
@@ -111,5 +117,59 @@ public class GoodsSaveService {
             result.put("message","상품등록 실패");
             return ResponseEntity.status(400).body(result);
         }
+
+    }
+
+    /**
+     * 상품 수정
+     * 작성자: 김대한
+     */
+    //상품 데이터를 읽어오는 트랙잭션을 읽기전용으로 설정
+    //why? JPA가 더티체킹(변경감지)을 수행하지 않아서 성능을 향상 시킬 수 있음
+    @Transactional(readOnly = true)
+    public ResponseEntity<Map<String, String>> modifyItem(GoodsModifyDto modifyDto, Long productId, Long
+            UserId, StockSaveDto stockSaveDto, GoodsImageDto goodsImageDto) {
+
+        Map<String, String> map = new HashMap<>();
+
+        Optional<ProductEntity> updateId = goodsEditRepository.findById(productId);
+
+        if (updateId.isPresent()) {
+            ProductEntity productEntity = updateId.get();
+            //product modify
+            if (productEntity.getProductId().equals(UserId)) {
+                productEntity.setCategoryEntity(modifyDto.getCategoryName());
+                productEntity.setProductName(modifyDto.getProductName());
+                productEntity.setProductPrice(modifyDto.getProductPrice());
+                //stock option modify
+                List<GoodsStockEntity> modifyStock = productEntity.getGoodsStockEntityList();
+                for (GoodsStockEntity goodsStockEntity : modifyStock) {
+                    goodsStockEntity.setStockColor(stockSaveDto.getStockColor());
+                    goodsStockEntity.setStockQuantity(stockSaveDto.getStockQuantity());
+                    goodsStockEntity.setStockSize(stockSaveDto.getStockSize());
+                }
+                List<GoodsImageEntity> imageEntities = productEntity.getGoodsImageEntityList();
+                for (GoodsImageEntity imageEntity : imageEntities) {
+                    //이미지 오리지널 네임 저장
+                    imageEntity.setProductImageOriginName(goodsImageDto.getProductImageOriginName());
+                    //s3 주소 저장
+                    imageEntity.setProductImage(goodsImageDto.getProductImage());
+                    //이미지 s3에 저장될 네임 저장
+                    imageEntity.setProductImageSave(goodsImageDto.getProductImageSave());
+                }
+
+                goodsEditRepository.save(productEntity);
+
+                map.put("message", "상품 수정 완료");
+                return ResponseEntity.status(200).body(map);
+            } else {
+                map.put("message", "상품 수정 권한이 없습니다.");
+                return ResponseEntity.status(403).body(map);
+            }
+        } else {
+            map.put("message", "상품을 찾을 수 없습니다.");
+            return ResponseEntity.status(404).body(map);
+        }
     }
 }
+

@@ -20,7 +20,6 @@ import java.util.List;
 @SuperBuilder // 나중에 알아보기
 // @Builder 는 상속받은 필드는 사용못함
 // @SuperBuilder 는 그걸 보완하기위해서 나온것 근데 설명보니 자식 클래스하고 부모클래스 양쪽에 해야된다는데
-// 제가 궁금한게 상속이면 extends인데 전 extends를 repository에서 밖에 안썻는데
 @Table(name = "product")
 public class ProductEntity {
 
@@ -50,7 +49,7 @@ public class ProductEntity {
 
 
     @OneToMany(mappedBy = "productEntity", cascade = CascadeType.ALL)
-    private List<GoodsImageEntity> goodsImageEntity;
+    private List<GoodsImageEntity> goodsImageEntityList;
     // May To One 으로 재고테이블 연관관계
 
 }

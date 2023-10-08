@@ -46,7 +46,7 @@ public class CartService {
             //재고보다 주문 수량이 많으면 리턴하기
             if(optionDto.getProductCount()>goodsStockEntity.getStockQuantity()){
                 map.put("message","주문 불가능 한 상품이 포함되어있습니다.");
-                return ResponseEntity.status(200).body(map);
+                return ResponseEntity.status(400).body(map);
             }
         }
 

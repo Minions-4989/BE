@@ -1,6 +1,7 @@
 package shopping.main.millions.entity.member;
 
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.service.cart.CartService;
@@ -37,6 +38,10 @@ public class MemberEntity {
     private String gender;
     @Column(name = "profile_image")
     private String profileImage;
+    //사용자 활성화 상태
+    @Column(name = "status")
+    @ColumnDefault("active")
+    private String status;
 
     @OneToMany(mappedBy = "memberEntity" , cascade = CascadeType.REMOVE , orphanRemoval = true , fetch = FetchType.LAZY)
     private List<CartProductEntity> cartProductEntityList;

@@ -39,4 +39,17 @@ public class CartController {
         String userId = tokenProvider.getUserPk(header);
         return cartService.CartProductList(userId);
     }
+
+    // 장바구니 수량 수정
+    @PatchMapping("/quantity/{id}")
+    public ResponseEntity<?> updateCartCount (
+            @PathVariable Long id,
+            @RequestParam String action,
+            HttpServletRequest request) {
+        String header = request.getHeader("X-AUTH-TOKEN");
+        String userId = tokenProvider.getUserPk(header);
+        if ("increase".equals(action)) return cartService.increaseQuantity(id);
+        else if ("decrease".equals(action)) return cartService.decreaseQuantity(id);
+        else return ResponseEntity.badRequest().body("잘못된 접근입니다.");
+    }
 }

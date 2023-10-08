@@ -104,4 +104,63 @@ public class CartService {
         return ResponseEntity.status(200).body(cartProductDtoList);
     }
 
+    public ResponseEntity<?> increaseQuantity(Long id) {
+
+        Optional<CartProductEntity> cartProductById = cartProductRepository.findById(id);
+        if (cartProductById.isPresent()){
+            CartProductEntity cartProductEntity = cartProductById.get();
+            Optional<GoodsStockEntity> goodsStockById =
+                    goodsStockRepository.findByStockSizeAndStockColorAndProductEntity_ProductId(
+                    cartProductEntity.getCartProductSize(),
+                    cartProductEntity.getCartProductColor(),
+                    cartProductEntity.getCartProductId()
+            );
+            GoodsStockEntity goodsStockEntity = goodsStockById.get();
+
+            // 구매수량이 재고수량보다 작으면
+            if (cartProductEntity.getCartProductCount() < goodsStockEntity.getStockQuantity()){
+
+                // 구매수량 +1
+                cartProductEntity.setCartProductCount(cartProductEntity.getCartProductCount()+1);
+
+                // Dto 변환
+                CartProductDto cartProductDto = new CartProductDto().builder()
+                        .cartProductCount(cartProductEntity.getCartProductCount())
+                        .build();
+
+                return ResponseEntity.ok(cartProductDto);
+            } else {
+                return ResponseEntity.badRequest().body("재고부족으로 더 이상 추가할 수 없습니다.");
+            }
+
+        } else {
+            return ResponseEntity.badRequest().body("해당 상품이 존재하지 않습니다.");
+        }
+    }
+
+    public ResponseEntity<?> decreaseQuantity(Long id) {
+        Optional<CartProductEntity> cartProductById = cartProductRepository.findById(id);
+        if (cartProductById.isPresent()){
+            CartProductEntity cartProductEntity = cartProductById.get();
+
+            // 구매수량이 1이 아니면
+            if (cartProductEntity.getCartProductCount() != 1){
+
+                // 구매수량 -1
+                cartProductEntity.setCartProductCount(cartProductEntity.getCartProductCount()-1);
+
+                // Dto 변환
+                CartProductDto cartProductDto = new CartProductDto().builder()
+                        .cartProductCount(cartProductEntity.getCartProductCount())
+                        .build();
+
+                return ResponseEntity.ok(cartProductDto);
+            } else {
+                return ResponseEntity.badRequest().body("구매수량을 더 이상 감소시킬 수 없습니다.");
+            }
+
+        } else {
+            return ResponseEntity.badRequest().body("해당 상품이 존재하지 않습니다.");
+        }
+    }
 }

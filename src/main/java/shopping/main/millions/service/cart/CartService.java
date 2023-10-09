@@ -18,6 +18,7 @@ import shopping.main.millions.repository.product.ProductRepository;
 import shopping.main.millions.repository.sales.GoodsStockRepository;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Log4j2
 @Service
@@ -104,4 +105,17 @@ public class CartService {
         return ResponseEntity.status(200).body(cartProductDtoList);
     }
 
+    public ResponseEntity<Map<String,String>> deleteProductList(List<CartProductEntity> cartProductEntityList, String userId){
+        Map<String, String> deleteMap = new HashMap<>();
+
+        List<Long> cartProductIds = cartProductEntityList.stream()
+                .map(CartProductEntity::getCartProductId)
+                .collect(Collectors.toList());
+
+        // 사용자 ID와 선택한 카트 상품 ID 목록을 기반으로 삭제
+        cartProductRepository.deleteByMemberEntity_UserIdAndCartProductIdIn(userId, cartProductIds);
+
+        deleteMap.put("message", "카트 상품이 삭제되었습니다.");
+        return ResponseEntity.ok(deleteMap);
+    }
 }

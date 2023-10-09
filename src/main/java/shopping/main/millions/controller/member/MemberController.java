@@ -14,7 +14,7 @@ import java.util.Map;
 @Log4j2
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/member")
+@RequestMapping("/auth")
 public class MemberController {
     private final MemberService memberService;
     @PostMapping("/signup")

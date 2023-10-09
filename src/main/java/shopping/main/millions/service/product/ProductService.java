@@ -6,7 +6,9 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shopping.main.millions.dto.product.ProductDto;
+import shopping.main.millions.entity.category.CategoryEntity;
 import shopping.main.millions.entity.product.ProductEntity;
+import shopping.main.millions.repository.category.CategoryRepository;
 import shopping.main.millions.repository.product.ProductRepository;
 
 import java.util.Optional;
@@ -15,6 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
     public Page<ProductDto> getProductsByPage(Pageable pageable) {
         Page<ProductEntity> products = productRepository.findAll(pageable);
@@ -50,14 +53,25 @@ public class ProductService {
         }
     }
 
-    public Page<ProductDto> getProductsByCategory(Pageable pageable, Long categoryId) {
-        Page<ProductEntity> products = productRepository.findAllByCategoryEntityOrderByProductId(categoryId,pageable);
-        Page<ProductDto> productDto = products.map(product -> ProductDto.builder()
-                .productId(product.getProductId())
-                .productName(product.getProductName())
-                .productPrice(product.getProductPrice())
-                .productDate(product.getProductDate())
-                .build());
-        return productDto;
+    public Page<ProductDto> getProductsByCategory(Pageable pageable, String categoryName) {
+
+        Optional<CategoryEntity> categoryEntityOptional = categoryRepository.findCategoryEntityByCategoryName(categoryName);
+
+        if(categoryEntityOptional.isPresent()) {
+            CategoryEntity categoryEntity = categoryEntityOptional.get();
+
+            Page<ProductEntity> products = productRepository.findAllByCategoryEntityOrderByProductId(categoryEntity, pageable);
+
+            Page<ProductDto> productDtoPage = products.map(product -> ProductDto.builder()
+                    .productId(product.getProductId())
+                    .productName(product.getProductName())
+                    .productPrice(product.getProductPrice())
+                    .productDate(product.getProductDate())
+                    .build());
+            return productDtoPage;
+        }
+        else{
+            return null;
+        }
     }
 }

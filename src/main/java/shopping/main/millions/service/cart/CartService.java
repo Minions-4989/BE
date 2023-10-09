@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import shopping.main.millions.dto.cart.CartAddDto;
 import shopping.main.millions.dto.cart.CartProductDto;
 import shopping.main.millions.dto.cart.CartProductInputDto;
@@ -29,6 +30,7 @@ public class CartService {
     private final GoodsStockRepository goodsStockRepository;
 
     //물품 장바구니 담기
+    @Transactional
     public ResponseEntity<Map<String, String>> addCart(CartAddDto cartAddDto) {
         Map<String, String> map = new HashMap<>();
         List<OptionDto> optionList = cartAddDto.getOption();
@@ -44,7 +46,7 @@ public class CartService {
             //재고보다 주문 수량이 많으면 리턴하기
             if(optionDto.getProductCount()>goodsStockEntity.getStockQuantity()){
                 map.put("message","주문 불가능 한 상품이 포함되어있습니다.");
-                return ResponseEntity.status(200).body(map);
+                return ResponseEntity.status(400).body(map);
             }
         }
 
@@ -66,8 +68,22 @@ public class CartService {
             cartProductInputDto.setProductCount(optionDto.getProductCount());
             //여기까지 카트 인풋 디티오 완성
 
+            //카트 인풋 디티오중에 장바구니에 이미 같은 품목이 있는가 검색
+            Optional<CartProductEntity> serchCartEntityOptional = cartProductRepository.findCartProductEntityByCartProductColorAndCartProductSizeAndMemberEntity_UserIdAndProductEntity_ProductId(
+                    optionDto.getProductColor(),optionDto.getProductSize(),memberEntity.getUserId(),productEntity.getProductId()
+            );
+            if(serchCartEntityOptional.isPresent()){
+                //있으면 있는거에서 수량을 늘리기
+                CartProductEntity serchCartEntity = serchCartEntityOptional.get();
+                //카트프로덕트 아이디를 가져온다.
+                Long cartProductId = serchCartEntity.getCartProductId();
+                //해당 아이디 값의 데이터에서 카운트 만 업데이트
+                cartProductRepository.updateCartProductCount(cartProductInputDto.getProductCount(),cartProductId);
+            }else{
+            //없다면 데이터 추가
+
             //디티오를 엔티티로 변환하기
-            CartProductEntity inputEntity =CartProductEntity.builder()
+            CartProductEntity insertEntity =CartProductEntity.builder()
                     .memberEntity(cartProductInputDto.getMemberEntity())
                     .productEntity(cartProductInputDto.getProductEntity())
                     .cartProductCount(cartProductInputDto.getProductCount())
@@ -75,7 +91,7 @@ public class CartService {
                     .cartProductColor(cartProductInputDto.getProductColor())
                     .build();
 
-            cartProductRepository.save(inputEntity);
+            cartProductRepository.save(insertEntity);}
 
         }
         map.put("message","장바구니에 추가되었습니다.");

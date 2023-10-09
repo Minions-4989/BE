@@ -24,7 +24,7 @@ public class CartController {
     private final TokenProvider tokenProvider;
 
     //상품 장바구니에 추가
-    @PostMapping("/new")
+    @PutMapping("/new")
     public ResponseEntity<Map<String,String>> addProductToCart(@RequestBody CartAddDto cartAddDto,HttpServletRequest request){
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);

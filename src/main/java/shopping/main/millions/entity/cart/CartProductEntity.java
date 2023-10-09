@@ -12,9 +12,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor
-@ToString //지워야징
 @AllArgsConstructor
 @Table(name = "cart_product")
 @SuperBuilder

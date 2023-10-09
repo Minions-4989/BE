@@ -120,9 +120,9 @@ public class CartService {
         return ResponseEntity.status(200).body(cartProductDtoList);
     }
 
-    public ResponseEntity<?> increaseQuantity(Long id) {
+    public ResponseEntity<?> increaseQuantity(Long cartProductId) {
 
-        Optional<CartProductEntity> cartProductById = cartProductRepository.findById(id);
+        Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductId);
         if (cartProductById.isPresent()){
             CartProductEntity cartProductEntity = cartProductById.get();
             Optional<GoodsStockEntity> goodsStockById =
@@ -136,12 +136,21 @@ public class CartService {
             // 구매수량이 재고수량보다 작으면
             if (cartProductEntity.getCartProductCount() < goodsStockEntity.getStockQuantity()){
 
-                // 구매수량 +1
+                // 구매수량 +1 후 save
                 cartProductEntity.setCartProductCount(cartProductEntity.getCartProductCount()+1);
+                cartProductRepository.save(cartProductEntity);
 
                 // Dto 변환
                 CartProductDto cartProductDto = new CartProductDto().builder()
                         .cartProductCount(cartProductEntity.getCartProductCount())
+                        .userId(cartProductEntity.getMemberEntity().getUserId())
+                        .productId(cartProductEntity.getCartProductId())
+                        .cartProductId(cartProductEntity.getCartProductId())
+                        .cartProductSize(cartProductEntity.getCartProductSize())
+                        .cartProductColor(cartProductEntity.getCartProductColor())
+                        .productPrice(cartProductEntity.getProductEntity().getProductPrice())
+                        .productName(cartProductEntity.getProductEntity().getProductName())
+                        .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
                         .build();
 
                 return ResponseEntity.ok(cartProductDto);
@@ -154,8 +163,8 @@ public class CartService {
         }
     }
 
-    public ResponseEntity<?> decreaseQuantity(Long id) {
-        Optional<CartProductEntity> cartProductById = cartProductRepository.findById(id);
+    public ResponseEntity<?> decreaseQuantity(Long cartProductId) {
+        Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductId);
         if (cartProductById.isPresent()){
             CartProductEntity cartProductEntity = cartProductById.get();
 
@@ -164,10 +173,19 @@ public class CartService {
 
                 // 구매수량 -1
                 cartProductEntity.setCartProductCount(cartProductEntity.getCartProductCount()-1);
+                cartProductRepository.save(cartProductEntity);
 
                 // Dto 변환
                 CartProductDto cartProductDto = new CartProductDto().builder()
                         .cartProductCount(cartProductEntity.getCartProductCount())
+                        .userId(cartProductEntity.getMemberEntity().getUserId())
+                        .productId(cartProductEntity.getCartProductId())
+                        .cartProductId(cartProductEntity.getCartProductId())
+                        .cartProductSize(cartProductEntity.getCartProductSize())
+                        .cartProductColor(cartProductEntity.getCartProductColor())
+                        .productPrice(cartProductEntity.getProductEntity().getProductPrice())
+                        .productName(cartProductEntity.getProductEntity().getProductName())
+                        .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
                         .build();
 
                 return ResponseEntity.ok(cartProductDto);

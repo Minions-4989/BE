@@ -24,7 +24,7 @@ public class CartController {
     private final TokenProvider tokenProvider;
 
     //상품 장바구니에 추가
-    @PutMapping("/add")
+    @PutMapping("/new")
     public ResponseEntity<Map<String,String>> addProductToCart(@RequestBody CartAddDto cartAddDto,HttpServletRequest request){
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
@@ -33,7 +33,7 @@ public class CartController {
     }
 
     //장바구니 조회
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<?> viewCartProductList (HttpServletRequest request){
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);

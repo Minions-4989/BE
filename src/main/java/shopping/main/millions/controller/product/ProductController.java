@@ -21,7 +21,7 @@ public class ProductController {
     private final ProductService productService;
 
     //상품 페이지 조회
-    @GetMapping("/")
+    @GetMapping("/list")
     public ResponseEntity<Page<ProductDto>> viewProductListByPage (@PageableDefault(page= 0, size = 10, sort = "productId", direction = Sort.Direction.ASC)
                                                                    Pageable pageable){
         Page<ProductDto> products = productService.getProductsByPage(pageable);

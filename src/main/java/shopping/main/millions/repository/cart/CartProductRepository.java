@@ -22,5 +22,4 @@ public interface CartProductRepository extends JpaRepository<CartProductEntity,L
     @Query("update CartProductEntity p set p.cartProductCount = p.cartProductCount + :count where p.cartProductId = :id")
     void updateCartProductCount(@Param("count") Long count, @Param("id") Long id);
 
-    List<CartProductEntity> deleteByMemberEntity_UserIdAndCartProductIdIn(String userId, List<Long> cartProductIds);
 }

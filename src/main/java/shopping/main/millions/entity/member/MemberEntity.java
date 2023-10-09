@@ -4,7 +4,6 @@ import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.product.ProductEntity;
-import shopping.main.millions.service.cart.CartService;
 
 import javax.persistence.*;
 import java.util.List;

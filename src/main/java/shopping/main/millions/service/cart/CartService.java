@@ -34,23 +34,22 @@ public class CartService {
         List<OptionDto> optionList = cartAddDto.getOption();
         //옵션을 선택한 수량 만큼 db라인 하나씩 추가
         //그전에 하나씩 선택수량이 주문 가능한지 판별
-        for(OptionDto optionDto : optionList){
+        for (OptionDto optionDto : optionList) {
             //cartProductDto의 productId와 optionList의 사이즈, 컬러 로 재고량 검색
             Optional<GoodsStockEntity> goodsStockEntityOptional =
                     goodsStockRepository.findByStockSizeAndStockColorAndProductEntity_ProductId
-                            (optionDto.getProductSize(),optionDto.getProductColor(),
+                            (optionDto.getProductSize(), optionDto.getProductColor(),
                                     cartAddDto.getProductId());
             GoodsStockEntity goodsStockEntity = goodsStockEntityOptional.get();
             //재고보다 주문 수량이 많으면 리턴하기
-            if(optionDto.getProductCount()>goodsStockEntity.getStockQuantity()){
-                map.put("message","주문 불가능 한 상품이 포함되어있습니다.");
+            if (optionDto.getProductCount() > goodsStockEntity.getStockQuantity()) {
+                map.put("message", "주문 불가능 한 상품이 포함되어있습니다.");
                 return ResponseEntity.status(400).body(map);
             }
         }
-
         //전체 물품이 주문 가능한 것으로 판별 됨
         //이제 모든 데이터를 CartProduct DB에 저장함
-        for (OptionDto optionDto : optionList){
+        for (OptionDto optionDto : optionList) {
             CartProductInputDto cartProductInputDto = new CartProductInputDto();
             //디티오에 저장하기 위해서 멤버엔티티, 프로덕트엔티티를 가져와야함 (근데 엔티티에 setter를 쓸 수 없으니, repository에서 불러옴)
             Optional<MemberEntity> memberEntityOptional = memberRepository.findById(cartAddDto.getUserId());
@@ -68,31 +67,32 @@ public class CartService {
 
             //카트 인풋 디티오중에 장바구니에 이미 같은 품목이 있는가 검색
             Optional<CartProductEntity> serchCartEntityOptional = cartProductRepository.findCartProductEntityByCartProductColorAndCartProductSizeAndMemberEntity_UserIdAndProductEntity_ProductId(
-                    optionDto.getProductColor(),optionDto.getProductSize(),memberEntity.getUserId(),productEntity.getProductId()
+                    optionDto.getProductColor(), optionDto.getProductSize(), memberEntity.getUserId(), productEntity.getProductId()
             );
-            if(serchCartEntityOptional.isPresent()){
+            if (serchCartEntityOptional.isPresent()) {
                 //있으면 있는거에서 수량을 늘리기
                 CartProductEntity serchCartEntity = serchCartEntityOptional.get();
                 //카트프로덕트 아이디를 가져온다.
                 Long cartProductId = serchCartEntity.getCartProductId();
                 //해당 아이디 값의 데이터에서 카운트 만 업데이트
-                cartProductRepository.updateCartProductCount(cartProductInputDto.getProductCount(),cartProductId);
-            }else{
-            //없다면 데이터 추가
+                cartProductRepository.updateCartProductCount(cartProductInputDto.getProductCount(), cartProductId);
+            } else {
+                //없다면 데이터 추가
 
-            //디티오를 엔티티로 변환하기
-            CartProductEntity insertEntity =CartProductEntity.builder()
-                    .memberEntity(cartProductInputDto.getMemberEntity())
-                    .productEntity(cartProductInputDto.getProductEntity())
-                    .cartProductCount(cartProductInputDto.getProductCount())
-                    .cartProductSize(cartProductInputDto.getProductSize())
-                    .cartProductColor(cartProductInputDto.getProductColor())
-                    .build();
+                //디티오를 엔티티로 변환하기
+                CartProductEntity insertEntity = CartProductEntity.builder()
+                        .memberEntity(cartProductInputDto.getMemberEntity())
+                        .productEntity(cartProductInputDto.getProductEntity())
+                        .cartProductCount(cartProductInputDto.getProductCount())
+                        .cartProductSize(cartProductInputDto.getProductSize())
+                        .cartProductColor(cartProductInputDto.getProductColor())
+                        .build();
 
                 cartProductRepository.save(insertEntity);
 
+            }
         }
-        map.put("message","장바구니에 추가되었습니다.");
+        map.put("message", "장바구니에 추가되었습니다.");
         return ResponseEntity.status(200).body(map);
     }
 
@@ -160,51 +160,55 @@ public class CartService {
         }
     }
 
-    public ResponseEntity<?> decreaseQuantity(Long cartProductId) {
-        Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductId);
-        if (cartProductById.isPresent()){
-            CartProductEntity cartProductEntity = cartProductById.get();
+        public ResponseEntity<?> decreaseQuantity(Long cartProductId) {
+            Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductId);
+            if (cartProductById.isPresent()){
+                CartProductEntity cartProductEntity = cartProductById.get();
 
-            // 구매수량이 1이 아니면
-            if (cartProductEntity.getCartProductCount() != 1){
+                // 구매수량이 1이 아니면
+                if (cartProductEntity.getCartProductCount() != 1){
 
-                // 구매수량 -1
-                cartProductEntity.setCartProductCount(cartProductEntity.getCartProductCount()-1);
-                cartProductRepository.save(cartProductEntity);
+                    // 구매수량 -1
+                    cartProductEntity.setCartProductCount(cartProductEntity.getCartProductCount()-1);
+                    cartProductRepository.save(cartProductEntity);
 
-               // Dto 변환
-                CartProductDto cartProductDto = new CartProductDto().builder()
-                        .cartProductCount(cartProductEntity.getCartProductCount())
-                        .userId(cartProductEntity.getMemberEntity().getUserId())
-                        .productId(cartProductEntity.getCartProductId())
-                        .cartProductId(cartProductEntity.getCartProductId())
-                        .cartProductSize(cartProductEntity.getCartProductSize())
-                        .cartProductColor(cartProductEntity.getCartProductColor())
-                        .productPrice(cartProductEntity.getProductEntity().getProductPrice())
-                        .productName(cartProductEntity.getProductEntity().getProductName())
-                        .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
-                        .build();
+                    // Dto 변환
+                    CartProductDto cartProductDto = new CartProductDto().builder()
+                            .cartProductCount(cartProductEntity.getCartProductCount())
+                            .userId(cartProductEntity.getMemberEntity().getUserId())
+                            .productId(cartProductEntity.getCartProductId())
+                            .cartProductId(cartProductEntity.getCartProductId())
+                            .cartProductSize(cartProductEntity.getCartProductSize())
+                            .cartProductColor(cartProductEntity.getCartProductColor())
+                            .productPrice(cartProductEntity.getProductEntity().getProductPrice())
+                            .productName(cartProductEntity.getProductEntity().getProductName())
+                            .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
+                            .build();
 
-                return ResponseEntity.ok(cartProductDto);
+                    return ResponseEntity.ok(cartProductDto);
+                } else {
+                    return ResponseEntity.badRequest().body("구매수량을 더 이상 감소시킬 수 없습니다.");
+                }
+
             } else {
-                return ResponseEntity.badRequest().body("구매수량을 더 이상 감소시킬 수 없습니다.");
+                return ResponseEntity.badRequest().body("해당 상품이 존재하지 않습니다.");
             }
-
-        } else {
-            return ResponseEntity.badRequest().body("해당 상품이 존재하지 않습니다.");
         }
-    }
-    public ResponseEntity<Map<String,String>> deleteProductList(List<CartProductEntity> cartProductEntityList, String userId){
-        Map<String, String> deleteMap = new HashMap<>();
+        public ResponseEntity<Map<String,String>> deleteProductList(List<Map<String, Long>> cartProductIdList, String userId){
+            Map<String, String> deleteMap = new HashMap<>();
+            for (Map<String,Long> cartProductList : cartProductIdList) {
+                    Long cartProductId= cartProductList.get("cartProductId");
 
-        List<Long> cartProductIds = cartProductEntityList.stream()
-                .map(CartProductEntity::getCartProductId)
-                .collect(Collectors.toList());
-
-        // 사용자 ID와 선택한 카트 상품 ID 목록을 기반으로 삭제
-        cartProductRepository.deleteByMemberEntity_UserIdAndCartProductIdIn(userId, cartProductIds);
-
-        deleteMap.put("message", "카트 상품이 삭제되었습니다.");
-        return ResponseEntity.ok(deleteMap);
-    }
+                    CartProductEntity cartProduct = cartProductRepository.findById(cartProductId).get();
+                    if(cartProduct.getMemberEntity().getUserId().equals(Long.valueOf(userId))){
+                        // 사용자 ID와 선택한 카트 상품 ID 목록을 기반으로 삭제
+                        cartProductRepository.deleteById(cartProductId);
+                    }else {
+                        deleteMap.put("message", "삭제에 실패했습니다.");
+                        return ResponseEntity.status(400).body(deleteMap);
+                    }
+            }
+            deleteMap.put("message", "카트 상품이 삭제되었습니다.");
+            return ResponseEntity.ok(deleteMap);
+        }
 }

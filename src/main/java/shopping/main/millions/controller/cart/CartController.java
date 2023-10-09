@@ -2,12 +2,9 @@ package shopping.main.millions.controller.cart;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shopping.main.millions.dto.cart.CartAddDto;
-import shopping.main.millions.dto.cart.CartProductDto;
-import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.jwt.TokenProvider;
 import shopping.main.millions.service.cart.CartService;
 
@@ -58,7 +55,8 @@ public class CartController {
 
     //장바구니 속 상품 삭제
     @DeleteMapping("/cartProduct")
-    public ResponseEntity<Map<String,String>> deleteCartProduct(@RequestParam List<CartProductEntity> cartProductEntityList, HttpServletRequest request){
+    public ResponseEntity<Map<String,String>> deleteCartProduct(@RequestBody List<Map<String,Long>> cartProductIdList, HttpServletRequest request){
+        log.info(cartProductIdList);
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
         return cartService.deleteProductList(cartProductIdList, userId);

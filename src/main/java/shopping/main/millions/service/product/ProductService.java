@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import shopping.main.millions.dto.product.ProductDto;
 import shopping.main.millions.entity.category.CategoryEntity;
 import shopping.main.millions.entity.product.ProductEntity;
-import shopping.main.millions.repository.category.CategoryRepository;
+import shopping.main.millions.repository.product.CategoryRepository;
 import shopping.main.millions.repository.product.ProductRepository;
 
 import java.util.Optional;

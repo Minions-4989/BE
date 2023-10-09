@@ -38,10 +38,6 @@ public class MemberEntity {
     private String gender;
     @Column(name = "profile_image")
     private String profileImage;
-    //사용자 활성화 상태
-    @Column(name = "status")
-    @ColumnDefault("active")
-    private String status;
 
     @OneToMany(mappedBy = "memberEntity" , cascade = CascadeType.REMOVE , orphanRemoval = true , fetch = FetchType.LAZY)
     private List<CartProductEntity> cartProductEntityList;

@@ -55,7 +55,7 @@ public class ProductService {
 
     public Page<ProductDto> getProductsByCategory(Pageable pageable, String categoryName) {
 
-        Optional<CategoryEntity> categoryEntityOptional = categoryRepository.findCategoryEntityByCategoryName(categoryName);
+        Optional<CategoryEntity> categoryEntityOptional = categoryRepository.findByCategoryName(categoryName);
 
         if(categoryEntityOptional.isPresent()) {
             CategoryEntity categoryEntity = categoryEntityOptional.get();

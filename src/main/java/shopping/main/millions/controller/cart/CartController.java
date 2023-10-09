@@ -39,7 +39,7 @@ public class CartController {
     public ResponseEntity<?> viewCartProductList (HttpServletRequest request){
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
-        return cartService.CartProductList(userId);
+        return cartService.cartProductList(userId);
     }
 
     // 장바구니 수량 수정
@@ -61,7 +61,7 @@ public class CartController {
     public ResponseEntity<Map<String,String>> deleteCartProduct(@RequestParam List<CartProductEntity> cartProductEntityList, HttpServletRequest request){
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
-        return cartService.deleteProductList(cartProductEntityList, userId);
+        return cartService.deleteProductList(cartProductIdList, userId);
     }
 
     //장바구니 주문

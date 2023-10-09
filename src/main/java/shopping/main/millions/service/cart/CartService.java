@@ -5,10 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shopping.main.millions.dto.cart.CartAddDto;
-import shopping.main.millions.dto.cart.CartProductDto;
-import shopping.main.millions.dto.cart.CartProductInputDto;
-import shopping.main.millions.dto.cart.OptionDto;
+import shopping.main.millions.dto.cart.*;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.product.GoodsStockEntity;
@@ -92,36 +89,35 @@ public class CartService {
                     .cartProductColor(cartProductInputDto.getProductColor())
                     .build();
 
-            cartProductRepository.save(inputEntity);
+                cartProductRepository.save(insertEntity);
 
         }
         map.put("message","장바구니에 추가되었습니다.");
         return ResponseEntity.status(200).body(map);
     }
 
+        public ResponseEntity<?> cartProductList (String userId){
+            List<CartProductEntity> cartProducts = cartProductRepository.findCartProductEntityByMemberEntity_UserId(Long.valueOf(userId));
+            List<CartProductDto> cartProductDtoList = new ArrayList<>();
 
-    public ResponseEntity<?> CartProductList(String userId) {
-        List<CartProductEntity> cartProducts = cartProductRepository.findCartProductEntityByMemberEntity_UserId(Long.valueOf(userId));
-        List<CartProductDto> cartProductDtoList = new ArrayList<>();
-
-        for (CartProductEntity cartProductEntity : cartProducts) {
-            CartProductDto dto = new CartProductDto().builder()
-                    .userId(cartProductEntity.getMemberEntity().getUserId())
-                    .productId(cartProductEntity.getProductEntity().getProductId())
-                    .cartProductId(cartProductEntity.getCartProductId())
-                    .cartProductCount(cartProductEntity.getCartProductCount())
-                    .cartProductSize(cartProductEntity.getCartProductSize())
-                    .cartProductColor(cartProductEntity.getCartProductColor())
-                    .productPrice(cartProductEntity.getProductEntity().getProductPrice())
-                    .productName(cartProductEntity.getProductEntity().getProductName())
-                    .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
-                    .build();
-            cartProductDtoList.add(dto);
+            for (CartProductEntity cartProductEntity : cartProducts) {
+                CartProductDto dto = new CartProductDto().builder()
+                        .userId(cartProductEntity.getMemberEntity().getUserId())
+                        .productId(cartProductEntity.getProductEntity().getProductId())
+                        .cartProductId(cartProductEntity.getCartProductId())
+                        .cartProductCount(cartProductEntity.getCartProductCount())
+                        .cartProductSize(cartProductEntity.getCartProductSize())
+                        .cartProductColor(cartProductEntity.getCartProductColor())
+                        .productPrice(cartProductEntity.getProductEntity().getProductPrice())
+                        .productName(cartProductEntity.getProductEntity().getProductName())
+                        .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
+                        .build();
+                cartProductDtoList.add(dto);
+            }
+            return ResponseEntity.status(200).body(cartProductDtoList);
         }
-        return ResponseEntity.status(200).body(cartProductDtoList);
-    }
 
-    public ResponseEntity<?> increaseQuantity(Long cartProductId) {
+    public ResponseEntity<?> increaseQuantity (Long cartProductId) {
 
         Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductId);
         if (cartProductById.isPresent()){

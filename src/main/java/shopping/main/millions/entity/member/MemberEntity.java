@@ -20,28 +20,27 @@ public class MemberEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "user_id")
     private Long userId;
-    @Column(name = "user_email" , nullable = false , unique = true)
+    @Column(name = "user_email" , nullable = false , unique = true , length = 50)
     private String userEmail;
-    @Column(name = "user_password" , nullable = false)
+    @Column(name = "user_password", nullable = false, length = 21)
     private String userPassword;
-    @Column(name = "address_zipcode", nullable = false)
+    @Column(name = "address_zipcode", nullable = false, length = 20)
     private String addressZipcode;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 100)
     private String address;
-    @Column(name = "user_name")
+    @Column(name = "user_name", length = 30)
     private String userName;
-    @Column(name = "address_detail" , nullable = false)
+    @Column(name = "address_detail", nullable = false, length = 100)
     private String addressDetail;
-    @Column(name = "tel_number" , nullable = false, unique = true)
+    @Column(name = "tel_number", nullable = false, unique = true, length = 13)
     private String telNumber;
-    @Column(nullable = false)
+    @Column(nullable = false, length = 10)
     private String gender;
     @Column(name = "profile_image")
     private String profileImage;
     //사용자 활성화 상태
     @Column(name = "status")
-    @ColumnDefault("active")
-    private String status;
+    private Boolean status;
 
     @OneToMany(mappedBy = "memberEntity" , cascade = CascadeType.REMOVE , orphanRemoval = true , fetch = FetchType.LAZY)
     private List<CartProductEntity> cartProductEntityList;

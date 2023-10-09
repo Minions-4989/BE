@@ -123,17 +123,22 @@ public class MemberService {
         if (findByEmail(login.get("email"))) {
             if (findByPasswordCheck(login.get("email"), login.get("password"))) {
                 MemberEntity memberEntity = memberRepository.findByUserEmail(login.get("email"));
-                LoginTokenSaveDto loginTokenSaveDto = LoginTokenSaveDto.builder()
-                        .id(memberEntity.getUserId())
-                        .email(memberEntity.getUserEmail())
-                        .build();
-                Token token = tokenProvider.createToken(loginTokenSaveDto.getId(), loginTokenSaveDto);
-                RefreshToken refreshToken = RefreshToken.builder()
-                        .token(token.getRefreshToken())
-                        .memberEntity(memberEntity)
-                        .build();
-                jwtRepository.save(refreshToken);
-                return ResponseEntity.status(200).headers(headers).body(token);
+                if(memberEntity.getStatus()){
+                    LoginTokenSaveDto loginTokenSaveDto = LoginTokenSaveDto.builder()
+                            .id(memberEntity.getUserId())
+                            .email(memberEntity.getUserEmail())
+                            .build();
+                    Token token = tokenProvider.createToken(loginTokenSaveDto.getId(), loginTokenSaveDto);
+                    RefreshToken refreshToken = RefreshToken.builder()
+                            .token(token.getRefreshToken())
+                            .memberEntity(memberEntity)
+                            .build();
+                    jwtRepository.save(refreshToken);
+                    return ResponseEntity.status(200).headers(headers).body(token);
+                }else{
+                    result.put("message" , "탈퇴한 회원입니다.");
+                    return ResponseEntity.status(401).body(result);
+                }
             }else{
                 result.put("message" , "이메일 또는 비밀번호가 일치하지 않아요!");
                 return ResponseEntity.status(401).body(result);
@@ -143,6 +148,7 @@ public class MemberService {
             return ResponseEntity.status(401).body(result);
         }
     }
+
 
     public boolean findByPasswordCheck(String email ,  String password){
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();

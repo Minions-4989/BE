@@ -175,7 +175,7 @@ public class CartService {
                 cartProductEntity.setCartProductCount(cartProductEntity.getCartProductCount()-1);
                 cartProductRepository.save(cartProductEntity);
 
-                // Dto 변환
+               // Dto 변환
                 CartProductDto cartProductDto = new CartProductDto().builder()
                         .cartProductCount(cartProductEntity.getCartProductCount())
                         .userId(cartProductEntity.getMemberEntity().getUserId())

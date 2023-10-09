@@ -41,15 +41,14 @@ public class CartController {
     }
 
     // 장바구니 수량 수정
-    @PatchMapping("/{id}")
+    @PatchMapping("/{cartProductId}")
     public ResponseEntity<?> updateCartCount (
-            @PathVariable Long id,
+            @PathVariable Long cartProductId,
             @RequestParam String action,
             HttpServletRequest request) {
         String header = request.getHeader("X-AUTH-TOKEN");
-        String userId = tokenProvider.getUserPk(header);
-        if ("increase".equals(action)) return cartService.increaseQuantity(id);
-        else if ("decrease".equals(action)) return cartService.decreaseQuantity(id);
+        if ("increase".equals(action)) return cartService.increaseQuantity(cartProductId);
+        else if ("decrease".equals(action)) return cartService.decreaseQuantity(cartProductId);
         else return ResponseEntity.badRequest().body("잘못된 접근입니다.");
     }
 

@@ -44,3 +44,7 @@ public class CartProductEntity {
 
 
 }
+
+//    @ManyToOne
+//    @JoinColumn(name = "user_id")
+//    private MemberEntity memberEntity;

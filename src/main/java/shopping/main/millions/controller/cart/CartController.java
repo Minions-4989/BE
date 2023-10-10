@@ -50,7 +50,6 @@ public class CartController {
         else return ResponseEntity.badRequest().body("잘못된 접근입니다.");
     }
 
-//    @PostMapping("/order")
 
     //장바구니 속 상품 삭제
     @DeleteMapping("/cartProduct")

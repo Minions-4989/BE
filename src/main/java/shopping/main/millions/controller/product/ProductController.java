@@ -37,7 +37,7 @@ public class ProductController {
     //카테고리별 조회
     @GetMapping("/category/{categoryName}")
     public ResponseEntity<Page<ProductDto>> searchProductByCategory(@PageableDefault(page= 0, size = 10, sort = "productId", direction = Sort.Direction.ASC)
-                                                                  Pageable pageable, @RequestParam String categoryName) {
+                                                                    Pageable pageable, @PathVariable String categoryName) {
         Page<ProductDto> products = productService.getProductsByCategory(pageable,categoryName);
         return ResponseEntity.ok(products);
     }

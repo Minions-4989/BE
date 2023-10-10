@@ -14,4 +14,5 @@ public class CartProductInputDto {
     private String productColor;
     private Long productCount;
     private ProductEntity productEntity;
+    private MemberEntity memberEntity;
 }

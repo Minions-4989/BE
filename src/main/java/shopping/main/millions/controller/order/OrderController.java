@@ -21,11 +21,16 @@ public class OrderController {
 
 
     @GetMapping("")
-    public ResponseEntity<?> getCartItems(@RequestParam("userId") String userId, HttpServletRequest request) {
+    public ResponseEntity<?> getCartItems(
+            //@RequestParam("userId") String userId,
+            HttpServletRequest request) {
         // 주문 서비스의 메서드를 호출하여 장바구니 목록을 가져온다.
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
-        List<CartProductDto> cartProductDtoList = orderService.getClass(userId);
-        return ResponseEntity.ok(cartProductDtoList);
+        //List<CartProductDto> cartProductDtoList = orderService.getClass(userId);
+        return ResponseEntity.ok(
+                //cartProductDtoList
+                null);
     }
+}
 

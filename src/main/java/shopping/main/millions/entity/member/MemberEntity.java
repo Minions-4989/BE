@@ -2,7 +2,7 @@ package shopping.main.millions.entity.member;
 
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import shopping.main.millions.entity.cart.CartProductEntity;
+import shopping.main.millions.entity.cart.CartEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.service.cart.CartService;
 
@@ -43,10 +43,11 @@ public class MemberEntity {
     @ColumnDefault("true")
     private Boolean status;
 
-    @OneToMany(mappedBy = "memberEntity" , cascade = CascadeType.REMOVE , orphanRemoval = true , fetch = FetchType.LAZY)
-    private List<CartProductEntity> cartProductEntityList;
-
     @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<ProductEntity> productEntityList;
+
+    @OneToOne
+    @JoinColumn(name = "cart_id")
+    private CartEntity cartEntity;
 
 }

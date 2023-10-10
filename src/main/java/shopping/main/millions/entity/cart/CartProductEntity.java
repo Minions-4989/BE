@@ -1,15 +1,14 @@
 package shopping.main.millions.entity.cart;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.JoinFormula;
-import shopping.main.millions.dto.cart.CartProductDto;
-import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.product.ProductEntity;
+import shopping.main.millions.entity.cart.CartEntity;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -35,12 +34,10 @@ public class CartProductEntity {
     private String cartProductColor; //구매할 상품 컬러
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private MemberEntity memberEntity;
-
-    @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
 
-
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    private CartEntity cartEntity;
 }

@@ -2,15 +2,18 @@ package shopping.main.millions.service.cart;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.aspectj.weaver.ast.Literal;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shopping.main.millions.dto.cart.*;
+import shopping.main.millions.entity.cart.CartEntity;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.product.GoodsStockEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.repository.cart.CartProductRepository;
+import shopping.main.millions.repository.cart.CartRepository;
 import shopping.main.millions.repository.member.MemberRepository;
 import shopping.main.millions.repository.product.ProductRepository;
 import shopping.main.millions.repository.sales.GoodsStockRepository;
@@ -26,6 +29,7 @@ public class CartService {
     private final MemberRepository memberRepository;
     private final CartProductRepository cartProductRepository;
     private final GoodsStockRepository goodsStockRepository;
+    private final CartRepository cartRepository;
 
     //물품 장바구니 담기
     @Transactional
@@ -51,10 +55,9 @@ public class CartService {
         //이제 모든 데이터를 CartProduct DB에 저장함
         for (OptionDto optionDto : optionList) {
             CartProductInputDto cartProductInputDto = new CartProductInputDto();
-            //디티오에 저장하기 위해서 멤버엔티티, 프로덕트엔티티를 가져와야함 (근데 엔티티에 setter를 쓸 수 없으니, repository에서 불러옴)
+            //디티오에 저장하기 위해서 사용자카트아이디, 프로덕트엔티티를 가져와야함 (근데 엔티티에 setter를 쓸 수 없으니, repositdory에서 불러옴)
             Optional<MemberEntity> memberEntityOptional = memberRepository.findById(cartAddDto.getUserId());
             MemberEntity memberEntity = memberEntityOptional.get();
-            cartProductInputDto.setMemberEntity(memberEntity);
 
             Optional<ProductEntity> productEntityOptional = productRepository.findById(cartAddDto.getProductId());
             ProductEntity productEntity = productEntityOptional.get();
@@ -66,8 +69,8 @@ public class CartService {
             //여기까지 카트 인풋 디티오 완성
 
             //카트 인풋 디티오중에 장바구니에 이미 같은 품목이 있는가 검색
-            Optional<CartProductEntity> serchCartEntityOptional = cartProductRepository.findCartProductEntityByCartProductColorAndCartProductSizeAndMemberEntity_UserIdAndProductEntity_ProductId(
-                    optionDto.getProductColor(), optionDto.getProductSize(), memberEntity.getUserId(), productEntity.getProductId()
+            Optional<CartProductEntity> serchCartEntityOptional = cartProductRepository.findCartProductEntityByCartProductColorAndCartProductSizeAndProductEntity_ProductId(
+                    optionDto.getProductColor(), optionDto.getProductSize(), productEntity.getProductId()
             );
             if (serchCartEntityOptional.isPresent()) {
                 //있으면 있는거에서 수량을 늘리기
@@ -81,7 +84,6 @@ public class CartService {
 
                 //디티오를 엔티티로 변환하기
                 CartProductEntity insertEntity = CartProductEntity.builder()
-                        .memberEntity(cartProductInputDto.getMemberEntity())
                         .productEntity(cartProductInputDto.getProductEntity())
                         .cartProductCount(cartProductInputDto.getProductCount())
                         .cartProductSize(cartProductInputDto.getProductSize())
@@ -97,12 +99,19 @@ public class CartService {
     }
 
         public ResponseEntity<?> cartProductList (String userId){
-            List<CartProductEntity> cartProducts = cartProductRepository.findCartProductEntityByMemberEntity_UserId(Long.valueOf(userId));
+            // userId를 통해 해당 CartEntity 찾기
+            Optional<CartEntity> cartEntityById = cartRepository.findCartEntityByMemberEntity_UserId(Long.valueOf(userId));
+            CartEntity cartEntity = cartEntityById.get();
+            Long cartId = cartEntity.getCartId();
+
+            // cartId를 통해 해당 CartProductEntity 찾기
+            Optional<List<CartProductEntity>> cartProductsById = cartProductRepository.findCartProductEntityByCartEntity_CartId(cartId);
+            List<CartProductEntity> cartProducts = cartProductsById.get();
             List<CartProductDto> cartProductDtoList = new ArrayList<>();
 
             for (CartProductEntity cartProductEntity : cartProducts) {
                 CartProductDto dto = new CartProductDto().builder()
-                        .userId(cartProductEntity.getMemberEntity().getUserId())
+                        .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
                         .productId(cartProductEntity.getProductEntity().getProductId())
                         .cartProductId(cartProductEntity.getCartProductId())
                         .cartProductCount(cartProductEntity.getCartProductCount())
@@ -117,6 +126,7 @@ public class CartService {
             return ResponseEntity.status(200).body(cartProductDtoList);
         }
 
+    // 수량 수정(증가)
     public ResponseEntity<?> increaseQuantity (Long cartProductId) {
 
         Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductId);
@@ -140,7 +150,7 @@ public class CartService {
                 // Dto 변환
                 CartProductDto cartProductDto = new CartProductDto().builder()
                         .cartProductCount(cartProductEntity.getCartProductCount())
-                        .userId(cartProductEntity.getMemberEntity().getUserId())
+                        .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
                         .productId(cartProductEntity.getCartProductId())
                         .cartProductId(cartProductEntity.getCartProductId())
                         .cartProductSize(cartProductEntity.getCartProductSize())
@@ -175,7 +185,7 @@ public class CartService {
                     // Dto 변환
                     CartProductDto cartProductDto = new CartProductDto().builder()
                             .cartProductCount(cartProductEntity.getCartProductCount())
-                            .userId(cartProductEntity.getMemberEntity().getUserId())
+                            .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
                             .productId(cartProductEntity.getCartProductId())
                             .cartProductId(cartProductEntity.getCartProductId())
                             .cartProductSize(cartProductEntity.getCartProductSize())
@@ -194,13 +204,15 @@ public class CartService {
                 return ResponseEntity.badRequest().body("해당 상품이 존재하지 않습니다.");
             }
         }
+
+        // 장바구니 삭제
         public ResponseEntity<Map<String,String>> deleteProductList(List<Map<String, Long>> cartProductIdList, String userId){
             Map<String, String> deleteMap = new HashMap<>();
             for (Map<String,Long> cartProductList : cartProductIdList) {
                     Long cartProductId= cartProductList.get("cartProductId");
 
                     CartProductEntity cartProduct = cartProductRepository.findById(cartProductId).get();
-                    if(cartProduct.getMemberEntity().getUserId().equals(Long.valueOf(userId))){
+                    if(cartProduct.getProductEntity().getMemberEntity().getUserId().equals(Long.valueOf(userId))){
                         // 사용자 ID와 선택한 카트 상품 ID 목록을 기반으로 삭제
                         cartProductRepository.deleteById(cartProductId);
                     }else {

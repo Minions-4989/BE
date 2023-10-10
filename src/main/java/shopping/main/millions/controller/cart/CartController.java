@@ -41,8 +41,7 @@ public class CartController {
 
     // 장바구니 수량 수정
     @PatchMapping("/{cartProductId}")
-    public ResponseEntity<?> updateCartCount (
-            @PathVariable Long cartProductId,
+    public ResponseEntity<?> updateCartCount (@PathVariable Long cartProductId,
             @RequestParam String action,
             HttpServletRequest request) {
         String header = request.getHeader("X-AUTH-TOKEN");
@@ -51,7 +50,6 @@ public class CartController {
         else return ResponseEntity.badRequest().body("잘못된 접근입니다.");
     }
 
-//    @PostMapping("/order")
 
     //장바구니 속 상품 삭제
     @DeleteMapping("/cartProduct")

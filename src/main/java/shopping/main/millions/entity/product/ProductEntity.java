@@ -9,6 +9,7 @@ import org.joda.time.DateTime;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.category.CategoryEntity;
 import shopping.main.millions.entity.member.MemberEntity;
+import shopping.main.millions.entity.order.OrderEntity;
 import shopping.main.millions.repository.sales.GoodsEditRepository;
 
 import javax.persistence.*;
@@ -56,4 +57,6 @@ public class ProductEntity {
     @JoinColumn(name="user_id")
     private MemberEntity memberEntity; //나의 판매물품 조회를 위한 유저 연관관계
 
+    @OneToMany(mappedBy = "productEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<OrderEntity> orderEntityList;
 }

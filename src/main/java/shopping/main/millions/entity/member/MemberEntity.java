@@ -48,4 +48,8 @@ public class MemberEntity {
     @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<ProductEntity> productEntityList;
 
+    @OneToOne
+    @JoinColumn(name = "cart_id")
+    private CartEntity cartEntity;
+
 }

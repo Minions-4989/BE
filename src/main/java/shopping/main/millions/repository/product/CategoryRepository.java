@@ -1,11 +1,8 @@
 package shopping.main.millions.repository.product;
 
-import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import shopping.main.millions.entity.category.CategoryEntity;
-import shopping.main.millions.entity.product.ProductEntity;
 
-import java.awt.print.Pageable;
 import java.util.Optional;
 
 public interface CategoryRepository extends JpaRepository<CategoryEntity, Long> {

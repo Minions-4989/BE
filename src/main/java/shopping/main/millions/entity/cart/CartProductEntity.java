@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
+import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.entity.cart.CartEntity;
 
@@ -40,4 +41,6 @@ public class CartProductEntity {
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private CartEntity cartEntity;
+
+
 }

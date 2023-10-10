@@ -12,9 +12,11 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CartProductRepository extends JpaRepository<CartProductEntity,Long> {
-    List<CartProductEntity> findCartProductEntityByMemberEntity_UserId(Long userId);
-    Optional<CartProductEntity> findCartProductEntityByCartProductColorAndCartProductSizeAndMemberEntity_UserIdAndProductEntity_ProductId(
-            String color, String size, Long userId, Long productId
+
+    Optional<List<CartProductEntity>> findCartProductEntityByCartEntity_CartId(Long cartId);
+
+    Optional<CartProductEntity> findCartProductEntityByCartProductColorAndCartProductSizeAndProductEntity_ProductId(
+            String color, String size, Long productId
     );
 
     @Transactional

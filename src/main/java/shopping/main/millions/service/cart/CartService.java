@@ -54,10 +54,9 @@ public class CartService {
         //이제 모든 데이터를 CartProduct DB에 저장함
         for (OptionDto optionDto : optionList) {
             CartProductInputDto cartProductInputDto = new CartProductInputDto();
-            //디티오에 저장하기 위해서 멤버엔티티, 프로덕트엔티티를 가져와야함 (근데 엔티티에 setter를 쓸 수 없으니, repository에서 불러옴)
+            //디티오에 저장하기 위해서 사용자카트아이디, 프로덕트엔티티를 가져와야함 (근데 엔티티에 setter를 쓸 수 없으니, repositdory에서 불러옴)
             Optional<MemberEntity> memberEntityOptional = memberRepository.findById(cartAddDto.getUserId());
             MemberEntity memberEntity = memberEntityOptional.get();
-            cartProductInputDto.setMemberEntity(memberEntity);
 
             Optional<ProductEntity> productEntityOptional = productRepository.findById(cartAddDto.getProductId());
             ProductEntity productEntity = productEntityOptional.get();
@@ -69,8 +68,8 @@ public class CartService {
             //여기까지 카트 인풋 디티오 완성
 
             //카트 인풋 디티오중에 장바구니에 이미 같은 품목이 있는가 검색
-            Optional<CartProductEntity> serchCartEntityOptional = cartProductRepository.findCartProductEntityByCartProductColorAndCartProductSizeAndMemberEntity_UserIdAndProductEntity_ProductId(
-                    optionDto.getProductColor(), optionDto.getProductSize(), memberEntity.getUserId(), productEntity.getProductId()
+            Optional<CartProductEntity> serchCartEntityOptional = cartProductRepository.findCartProductEntityByCartProductColorAndCartProductSizeAndProductEntity_ProductId(
+                    optionDto.getProductColor(), optionDto.getProductSize(), productEntity.getProductId()
             );
             if (serchCartEntityOptional.isPresent()) {
                 //있으면 있는거에서 수량을 늘리기

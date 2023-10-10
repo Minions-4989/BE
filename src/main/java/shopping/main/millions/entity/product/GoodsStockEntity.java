@@ -15,9 +15,9 @@ import javax.persistence.*;
 @SuperBuilder
 //재고 테이블
 public class GoodsStockEntity {
-
+    //자동 증가 없어서 추가했습니다.
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stock_id")
     private Long stockId;       //stock
 

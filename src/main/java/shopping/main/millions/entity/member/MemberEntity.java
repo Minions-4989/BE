@@ -2,7 +2,7 @@ package shopping.main.millions.entity.member;
 
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
-import shopping.main.millions.entity.cart.CartProductEntity;
+import shopping.main.millions.entity.cart.CartEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 
 import javax.persistence.*;
@@ -41,9 +41,6 @@ public class MemberEntity {
     @Column(name = "status")
     @ColumnDefault("true")
     private Boolean status;
-
-    @OneToMany(mappedBy = "memberEntity" , cascade = CascadeType.REMOVE , orphanRemoval = true , fetch = FetchType.LAZY)
-    private List<CartProductEntity> cartProductEntityList;
 
     @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<ProductEntity> productEntityList;

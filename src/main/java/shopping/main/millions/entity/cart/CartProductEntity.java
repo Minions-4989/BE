@@ -1,15 +1,13 @@
 package shopping.main.millions.entity.cart;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.hibernate.annotations.JoinFormula;
-import shopping.main.millions.dto.cart.CartProductDto;
-import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Getter
@@ -42,7 +40,9 @@ public class CartProductEntity {
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
 
-
+    @ManyToOne
+    @JoinColumn(name = "cart_id")
+    private CartEntity cartEntity; //'Many To One' attribute type should not be 'CartEntity
 }
 
 //    @ManyToOne

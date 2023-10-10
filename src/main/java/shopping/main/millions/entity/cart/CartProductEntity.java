@@ -33,10 +33,6 @@ public class CartProductEntity {
     private String cartProductColor; //구매할 상품 컬러
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
-    private MemberEntity memberEntity;
-
-    @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
 

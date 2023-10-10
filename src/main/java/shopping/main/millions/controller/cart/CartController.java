@@ -41,8 +41,7 @@ public class CartController {
 
     // 장바구니 수량 수정
     @PatchMapping("/{cartProductId}")
-    public ResponseEntity<?> updateCartCount (
-            @PathVariable Long cartProductId,
+    public ResponseEntity<?> updateCartCount (@PathVariable Long cartProductId,
             @RequestParam String action,
             HttpServletRequest request) {
         String header = request.getHeader("X-AUTH-TOKEN");

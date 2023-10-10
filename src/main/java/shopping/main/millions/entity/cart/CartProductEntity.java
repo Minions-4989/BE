@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import shopping.main.millions.entity.product.ProductEntity;
+import shopping.main.millions.entity.cart.CartEntity;
 
 import javax.persistence.*;
 
@@ -38,9 +39,5 @@ public class CartProductEntity {
 
     @ManyToOne
     @JoinColumn(name = "cart_id")
-    private CartEntity cartEntity; //'Many To One' attribute type should not be 'CartEntity
+    private CartEntity cartEntity;
 }
-
-//    @ManyToOne
-//    @JoinColumn(name = "user_id")
-//    private MemberEntity memberEntity;

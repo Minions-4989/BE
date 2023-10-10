@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
+import shopping.main.millions.entity.cart.CartEntity;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 
@@ -15,9 +16,9 @@ public interface CartProductRepository extends JpaRepository<CartProductEntity,L
 
     Optional<List<CartProductEntity>> findCartProductEntityByCartEntity_CartId(Long cartId);
 
-    Optional<CartProductEntity> findCartProductEntityByCartProductColorAndCartProductSizeAndProductEntity_ProductId(
-            String color, String size, Long productId
-    );
+    Optional<CartProductEntity> findCartProductEntityByCartProductColorAndCartProductSizeAndProductEntity_ProductIdAndCartEntity_CartId(
+            String color, String size, Long productId, Long cartId
+            );
 
     @Transactional
     @Modifying

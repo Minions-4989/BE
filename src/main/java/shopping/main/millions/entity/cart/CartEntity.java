@@ -24,7 +24,9 @@ public class CartEntity {
     @OneToMany(mappedBy = "cartEntity")
     private List<CartProductEntity> cartProductEntityList;
 
-    @OneToOne(mappedBy = "cartEntity" )
+    //카트 엔티티 쪽에서 유저 아이디를 가지도록 변경했습니다.
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private MemberEntity memberEntity;
 
     @OneToMany(mappedBy = "cartEntity")

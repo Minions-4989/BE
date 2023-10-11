@@ -120,33 +120,33 @@ public class CartService {
         return ResponseEntity.status(200).body(map);
     }
 
-        public ResponseEntity<?> cartProductList (String userId){
-            // userId를 통해 해당 CartEntity 찾기
-            Optional<CartEntity> cartEntityById = cartRepository.findCartEntityByMemberEntity_UserId(Long.valueOf(userId));
-            CartEntity cartEntity = cartEntityById.get();
-            Long cartId = cartEntity.getCartId();
+    public ResponseEntity<?> cartProductList (String userId){
+        // userId를 통해 해당 CartEntity 찾기
+        Optional<CartEntity> cartEntityById = cartRepository.findCartEntityByMemberEntity_UserId(Long.valueOf(userId));
+        CartEntity cartEntity = cartEntityById.get();
+        Long cartId = cartEntity.getCartId();
 
-            // cartId를 통해 해당 CartProductEntity 찾기
-            Optional<List<CartProductEntity>> cartProductsById = cartProductRepository.findCartProductEntityByCartEntity_CartId(cartId);
-            List<CartProductEntity> cartProducts = cartProductsById.get();
-            List<CartProductDto> cartProductDtoList = new ArrayList<>();
+        // cartId를 통해 해당 CartProductEntity 찾기
+        Optional<List<CartProductEntity>> cartProductsById = cartProductRepository.findCartProductEntityByCartEntity_CartId(cartId);
+        List<CartProductEntity> cartProducts = cartProductsById.get();
+        List<CartProductDto> cartProductDtoList = new ArrayList<>();
 
-            for (CartProductEntity cartProductEntity : cartProducts) {
-                CartProductDto dto = new CartProductDto().builder()
-                        .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
-                        .productId(cartProductEntity.getProductEntity().getProductId())
-                        .cartProductId(cartProductEntity.getCartProductId())
-                        .cartProductCount(cartProductEntity.getCartProductCount())
-                        .cartProductSize(cartProductEntity.getCartProductSize())
-                        .cartProductColor(cartProductEntity.getCartProductColor())
-                        .productPrice(cartProductEntity.getProductEntity().getProductPrice())
-                        .productName(cartProductEntity.getProductEntity().getProductName())
-                        .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
-                        .build();
-                cartProductDtoList.add(dto);
-            }
-            return ResponseEntity.status(200).body(cartProductDtoList);
+        for (CartProductEntity cartProductEntity : cartProducts) {
+            CartProductDto dto = new CartProductDto().builder()
+                    .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
+                    .productId(cartProductEntity.getProductEntity().getProductId())
+                    .cartProductId(cartProductEntity.getCartProductId())
+                    .cartProductCount(cartProductEntity.getCartProductCount())
+                    .cartProductSize(cartProductEntity.getCartProductSize())
+                    .cartProductColor(cartProductEntity.getCartProductColor())
+                    .productPrice(cartProductEntity.getProductEntity().getProductPrice())
+                    .productName(cartProductEntity.getProductEntity().getProductName())
+                    .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
+                    .build();
+            cartProductDtoList.add(dto);
         }
+        return ResponseEntity.status(200).body(cartProductDtoList);
+    }
 
     // 수량 수정(증가)
     public ResponseEntity<?> increaseQuantity (Long cartProductId) {
@@ -193,57 +193,57 @@ public class CartService {
         }
     }
 
-        public ResponseEntity<?> decreaseQuantity(Long cartProductId) {
-            Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductId);
-            if (cartProductById.isPresent()){
-                CartProductEntity cartProductEntity = cartProductById.get();
+    public ResponseEntity<?> decreaseQuantity(Long cartProductId) {
+        Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductId);
+        if (cartProductById.isPresent()){
+            CartProductEntity cartProductEntity = cartProductById.get();
 
-                // 구매수량이 1이 아니면
-                if (cartProductEntity.getCartProductCount() != 1){
+            // 구매수량이 1이 아니면
+            if (cartProductEntity.getCartProductCount() != 1){
 
-                    // 구매수량 -1
-                    cartProductEntity.setCartProductCount(cartProductEntity.getCartProductCount()-1);
-                    cartProductRepository.save(cartProductEntity);
+                // 구매수량 -1
+                cartProductEntity.setCartProductCount(cartProductEntity.getCartProductCount()-1);
+                cartProductRepository.save(cartProductEntity);
 
-                    // Dto 변환
-                    CartProductDto cartProductDto = new CartProductDto().builder()
-                            .cartProductCount(cartProductEntity.getCartProductCount())
-                            .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
-                            .productId(cartProductEntity.getCartProductId())
-                            .cartProductId(cartProductEntity.getCartProductId())
-                            .cartProductSize(cartProductEntity.getCartProductSize())
-                            .cartProductColor(cartProductEntity.getCartProductColor())
-                            .productPrice(cartProductEntity.getProductEntity().getProductPrice())
-                            .productName(cartProductEntity.getProductEntity().getProductName())
-                            .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
-                            .build();
+                // Dto 변환
+                CartProductDto cartProductDto = new CartProductDto().builder()
+                        .cartProductCount(cartProductEntity.getCartProductCount())
+                        .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
+                        .productId(cartProductEntity.getCartProductId())
+                        .cartProductId(cartProductEntity.getCartProductId())
+                        .cartProductSize(cartProductEntity.getCartProductSize())
+                        .cartProductColor(cartProductEntity.getCartProductColor())
+                        .productPrice(cartProductEntity.getProductEntity().getProductPrice())
+                        .productName(cartProductEntity.getProductEntity().getProductName())
+                        .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
+                        .build();
 
-                    return ResponseEntity.ok(cartProductDto);
-                } else {
-                    return ResponseEntity.badRequest().body("구매수량을 더 이상 감소시킬 수 없습니다.");
-                }
-
+                return ResponseEntity.ok(cartProductDto);
             } else {
-                return ResponseEntity.badRequest().body("해당 상품이 존재하지 않습니다.");
+                return ResponseEntity.badRequest().body("구매수량을 더 이상 감소시킬 수 없습니다.");
+            }
+
+        } else {
+            return ResponseEntity.badRequest().body("해당 상품이 존재하지 않습니다.");
+        }
+    }
+
+    // 장바구니 삭제
+    public ResponseEntity<Map<String,String>> deleteProductList(List<Map<String, Long>> cartProductIdList, String userId){
+        Map<String, String> deleteMap = new HashMap<>();
+        for (Map<String,Long> cartProductList : cartProductIdList) {
+            Long cartProductId= cartProductList.get("cartProductId");
+
+            CartProductEntity cartProduct = cartProductRepository.findById(cartProductId).get();
+            if(cartProduct.getProductEntity().getMemberEntity().getUserId().equals(Long.valueOf(userId))){
+                // 사용자 ID와 선택한 카트 상품 ID 목록을 기반으로 삭제
+                cartProductRepository.deleteById(cartProductId);
+            }else {
+                deleteMap.put("message", "삭제에 실패했습니다.");
+                return ResponseEntity.status(400).body(deleteMap);
             }
         }
-
-        // 장바구니 삭제
-        public ResponseEntity<Map<String,String>> deleteProductList(List<Map<String, Long>> cartProductIdList, String userId){
-            Map<String, String> deleteMap = new HashMap<>();
-            for (Map<String,Long> cartProductList : cartProductIdList) {
-                    Long cartProductId= cartProductList.get("cartProductId");
-
-                    CartProductEntity cartProduct = cartProductRepository.findById(cartProductId).get();
-                    if(cartProduct.getProductEntity().getMemberEntity().getUserId().equals(Long.valueOf(userId))){
-                        // 사용자 ID와 선택한 카트 상품 ID 목록을 기반으로 삭제
-                        cartProductRepository.deleteById(cartProductId);
-                    }else {
-                        deleteMap.put("message", "삭제에 실패했습니다.");
-                        return ResponseEntity.status(400).body(deleteMap);
-                    }
-            }
-            deleteMap.put("message", "카트 상품이 삭제되었습니다.");
-            return ResponseEntity.ok(deleteMap);
-        }
+        deleteMap.put("message", "카트 상품이 삭제되었습니다.");
+        return ResponseEntity.ok(deleteMap);
+    }
 }

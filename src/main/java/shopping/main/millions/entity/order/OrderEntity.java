@@ -12,6 +12,7 @@ import javax.persistence.*;
 @Builder
 @Table(name = "user_order")
 public class OrderEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_id")
@@ -30,7 +31,7 @@ public class OrderEntity {
     private String cartProductColor; // 상품 색상
 
     @Column(name = "product_price")
-    private Long productPrice; // 상품 가격
+    private Integer productPrice; // 상품 가격
 
     @ManyToOne
     @JoinColumn(name = "product_id")

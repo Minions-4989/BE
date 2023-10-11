@@ -131,6 +131,7 @@ public class CartService {
             List<CartProductEntity> cartProducts = cartProductsById.get();
             List<CartProductDto> cartProductDtoList = new ArrayList<>();
 
+            // Dto 변환
             for (CartProductEntity cartProductEntity : cartProducts) {
                 CartProductDto dto = new CartProductDto().builder()
                         .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
@@ -158,7 +159,6 @@ public class CartService {
                     goodsStockRepository.findByStockSizeAndStockColorAndProductEntity_ProductId(
                     cartProductEntity.getCartProductSize(),
                     cartProductEntity.getCartProductColor(),
-                    //카트 프로덕트 아이디가 아닌 프로덕트아이디로 검색
                     cartProductEntity.getProductEntity().getProductId()
             );
             GoodsStockEntity goodsStockEntity = goodsStockById.get();
@@ -171,6 +171,20 @@ public class CartService {
                 cartProductRepository.save(cartProductEntity);
 
                 // Dto 변환
+                Long productId = cartProductEntity.getProductEntity().getProductId();
+                Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productId);
+                List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
+                List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
+
+                for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
+                    GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
+                            .productImage(goodsImageEntity.getProductImage())
+                            .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+                            .productImageSave(goodsImageEntity.getProductImageSave())
+                            .build();
+                    goodsImageDtoList.add(goodsImageDto);
+                }
+
                 CartProductDto cartProductDto = new CartProductDto().builder()
                         .cartProductCount(cartProductEntity.getCartProductCount())
                         .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
@@ -180,7 +194,7 @@ public class CartService {
                         .cartProductColor(cartProductEntity.getCartProductColor())
                         .productPrice(cartProductEntity.getProductEntity().getProductPrice())
                         .productName(cartProductEntity.getProductEntity().getProductName())
-                        .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
+                        .productImage(goodsImageDtoList)
                         .build();
 
                 return ResponseEntity.ok(cartProductDto);
@@ -206,6 +220,20 @@ public class CartService {
                     cartProductRepository.save(cartProductEntity);
 
                     // Dto 변환
+                    Long productId = cartProductEntity.getProductEntity().getProductId();
+                    Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productId);
+                    List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
+                    List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
+
+                    for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
+                        GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
+                                .productImage(goodsImageEntity.getProductImage())
+                                .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+                                .productImageSave(goodsImageEntity.getProductImageSave())
+                                .build();
+                        goodsImageDtoList.add(goodsImageDto);
+                    }
+
                     CartProductDto cartProductDto = new CartProductDto().builder()
                             .cartProductCount(cartProductEntity.getCartProductCount())
                             .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
@@ -215,7 +243,7 @@ public class CartService {
                             .cartProductColor(cartProductEntity.getCartProductColor())
                             .productPrice(cartProductEntity.getProductEntity().getProductPrice())
                             .productName(cartProductEntity.getProductEntity().getProductName())
-                            .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
+                            .productImage(goodsImageDtoList)
                             .build();
 
                     return ResponseEntity.ok(cartProductDto);
@@ -232,16 +260,16 @@ public class CartService {
         public ResponseEntity<Map<String,String>> deleteProductList(List<Map<String, Long>> cartProductIdList, String userId){
             Map<String, String> deleteMap = new HashMap<>();
             for (Map<String,Long> cartProductList : cartProductIdList) {
-                    Long cartProductId= cartProductList.get("cartProductId");
+                Long cartProductId= cartProductList.get("cartProductId");
 
-                    CartProductEntity cartProduct = cartProductRepository.findById(cartProductId).get();
-                    if(cartProduct.getProductEntity().getMemberEntity().getUserId().equals(Long.valueOf(userId))){
-                        // 사용자 ID와 선택한 카트 상품 ID 목록을 기반으로 삭제
-                        cartProductRepository.deleteById(cartProductId);
-                    }else {
-                        deleteMap.put("message", "삭제에 실패했습니다.");
-                        return ResponseEntity.status(400).body(deleteMap);
-                    }
+                CartProductEntity cartProduct = cartProductRepository.findById(cartProductId).get();
+                if(cartProduct.getProductEntity().getMemberEntity().getUserId().equals(Long.valueOf(userId))){
+                    // 사용자 ID와 선택한 카트 상품 ID 목록을 기반으로 삭제
+                    cartProductRepository.deleteById(cartProductId);
+                }else {
+                    deleteMap.put("message", "삭제에 실패했습니다.");
+                    return ResponseEntity.status(400).body(deleteMap);
+                }
             }
             deleteMap.put("message", "카트 상품이 삭제되었습니다.");
             return ResponseEntity.ok(deleteMap);

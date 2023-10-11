@@ -8,15 +8,18 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shopping.main.millions.dto.cart.*;
+import shopping.main.millions.dto.sales.GoodsImageDto;
 import shopping.main.millions.entity.cart.CartEntity;
 import shopping.main.millions.entity.cart.CartProductEntity;
 import shopping.main.millions.entity.member.MemberEntity;
+import shopping.main.millions.entity.product.GoodsImageEntity;
 import shopping.main.millions.entity.product.GoodsStockEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.repository.cart.CartProductRepository;
 import shopping.main.millions.repository.cart.CartRepository;
 import shopping.main.millions.repository.member.MemberRepository;
 import shopping.main.millions.repository.product.ProductRepository;
+import shopping.main.millions.repository.sales.GoodsImageRepository;
 import shopping.main.millions.repository.sales.GoodsStockRepository;
 
 import java.util.*;
@@ -31,6 +34,7 @@ public class CartService {
     private final CartProductRepository cartProductRepository;
     private final GoodsStockRepository goodsStockRepository;
     private final CartRepository cartRepository;
+    private final GoodsImageRepository goodsImageRepository;
 
     //물품 장바구니 담기
     @Transactional

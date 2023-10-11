@@ -27,8 +27,8 @@ public class OrderPaymentEntity {
     @Column(name = "card_expiration_period")
     private String cardExpirationPeriod; //카드 유효기간
 
-    @Column(name = "delivery_price")
-    private String deliveryPrice; // 결제 총 금액
+    @Column(name = "total_price")
+    private Integer totalPrice; // 결제 총 금액
 
     @Column(name = "delivery_date")
     private LocalDateTime deliveryDate; // 구매 날짜

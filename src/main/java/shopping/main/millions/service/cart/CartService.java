@@ -133,6 +133,21 @@ public class CartService {
 
             // Dto 변환
             for (CartProductEntity cartProductEntity : cartProducts) {
+
+                Long productId =cartProductEntity.getProductEntity().getProductId();
+                Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productId);
+                List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
+                List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
+
+                for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
+                    GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
+                            .productImage(goodsImageEntity.getProductImage())
+                            .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+                            .productImageSave(goodsImageEntity.getProductImageSave())
+                            .build();
+                    goodsImageDtoList.add(goodsImageDto);
+                }
+
                 CartProductDto dto = new CartProductDto().builder()
                         .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
                         .productId(cartProductEntity.getProductEntity().getProductId())
@@ -142,7 +157,7 @@ public class CartService {
                         .cartProductColor(cartProductEntity.getCartProductColor())
                         .productPrice(cartProductEntity.getProductEntity().getProductPrice())
                         .productName(cartProductEntity.getProductEntity().getProductName())
-                        .productImage(cartProductEntity.getProductEntity().getGoodsImageEntity())
+                        .productImage(goodsImageDtoList)
                         .build();
                 cartProductDtoList.add(dto);
             }

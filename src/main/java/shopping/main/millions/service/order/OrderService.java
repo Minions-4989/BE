@@ -6,12 +6,15 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shopping.main.millions.dto.cart.CartProductDto;
 import shopping.main.millions.dto.order.OrderDto;
+import shopping.main.millions.entity.cart.CartEntity;
 import shopping.main.millions.entity.cart.CartProductEntity;
+import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.order.OrderEntity;
 import shopping.main.millions.entity.order.OrderPaymentEntity;
 import shopping.main.millions.entity.order.UserOrderEntity;
 import shopping.main.millions.entity.product.GoodsStockEntity;
 import shopping.main.millions.repository.cart.CartProductRepository;
+import shopping.main.millions.repository.member.MemberRepository;
 import shopping.main.millions.repository.order.OrderPaymentRepository;
 import shopping.main.millions.repository.order.OrderRepository;
 import shopping.main.millions.repository.order.UserOrderRepository;
@@ -30,9 +33,11 @@ public class OrderService {
     private final OrderPaymentRepository orderPaymentRepository;
     private final GoodsStockRepository goodsStockRepository;
     private final CartProductRepository cartProductRepository;
+    private final MemberRepository memberRepository;
 
-    public ResponseEntity<?> saveUser(OrderDto orderDto) {
+    public UserOrderEntity saveUser(OrderDto orderDto , String userId) {
         // Entity 변환 후 저장
+        MemberEntity memberEntity = memberRepository.findById(Long.valueOf(userId)).get();
         UserOrderEntity userOrderEntity = UserOrderEntity.builder()
                 .tellNumber(orderDto.getTelNumber())
                 .userName(orderDto.getUserName())
@@ -40,10 +45,13 @@ public class OrderService {
                 .addressDetail(orderDto.getAddressDetail())
                 .addressZipcode(orderDto.getAddressZipcode())
                 .userEmail(orderDto.getUserEmail())
+                .cartEntity(memberEntity.getCartEntity())
                 .build();
-        userOrderRepository.save(userOrderEntity);
+        // 한 손 머리위로 들고 내리치면서 보는중 됬죵? 다 그런건죵^^ 이런식으로 나머지도 하셔요^^ 안해줄거예영 ㅋㄷ
+        //이건 멀 저장하는건가영? 근데 카트id의 정보는 어디서 받아서 저장하는건가요? 카트의 정보를 어디서도 받지를않는데영???? 아니죠 카트의 정보는 어디있어요? 럼그글
+        UserOrderEntity userOrder = userOrderRepository.save(userOrderEntity);
 
-        return ResponseEntity.ok("저장 완료");
+        return userOrder;
     }
 
     public ResponseEntity<?> saveUserPayment(OrderDto orderDto,  UserOrderEntity userOrder){

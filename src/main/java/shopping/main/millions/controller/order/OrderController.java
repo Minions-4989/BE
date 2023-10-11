@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shopping.main.millions.dto.order.OrderDto;
 import shopping.main.millions.dto.order.OrderGetDto;
+import shopping.main.millions.entity.order.UserOrderEntity;
 import shopping.main.millions.jwt.TokenProvider;
 import shopping.main.millions.service.order.OrderService;
 
@@ -34,8 +35,8 @@ public class OrderController {
     public ResponseEntity<?> orderInfo (@RequestBody OrderDto orderDto, HttpServletRequest request) {
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
-        orderService.saveUser(orderDto);
-        orderService.saveUserPayment(orderDto);
+        UserOrderEntity userOrderEntity = orderService.saveUser(orderDto, userId);
+        orderService.saveUserPayment(orderDto , userOrderEntity);
         return ResponseEntity.ok("200");
     }
 

@@ -5,6 +5,7 @@ import shopping.main.millions.dto.cart.CartProductDto;
 
 import javax.persistence.Column;
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -23,7 +24,7 @@ public class OrderDto {
 
     private Integer totalPrice;
 
-    private LocalDateTime orderDate;
+    private Date orderDate;
 
     // 수령인 정보
     private String telNumber;

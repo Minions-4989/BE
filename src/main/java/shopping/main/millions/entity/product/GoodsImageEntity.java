@@ -13,7 +13,7 @@ import javax.persistence.*;
 public class GoodsImageEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "image_id")
     private Long imageId;
 

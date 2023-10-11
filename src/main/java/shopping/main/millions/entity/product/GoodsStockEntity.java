@@ -17,7 +17,7 @@ import javax.persistence.*;
 public class GoodsStockEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "stock_id")
     private Long stockId;       //stock
 

@@ -12,19 +12,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import shopping.main.millions.dto.sales.*;
+import shopping.main.millions.dto.product.ProductListResponseDto;
+import shopping.main.millions.dto.sales.GoodsImageDto;
+import shopping.main.millions.dto.sales.GoodsModifyDto;
+import shopping.main.millions.dto.sales.GoodsSaveDto;
+import shopping.main.millions.dto.sales.StockSaveDto;
 import shopping.main.millions.entity.category.CategoryEntity;
 import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.product.GoodsImageEntity;
 import shopping.main.millions.entity.product.GoodsStockEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.repository.member.MemberRepository;
+import shopping.main.millions.repository.product.CategoryRepository;
+import shopping.main.millions.repository.product.ProductRepository;
 import shopping.main.millions.repository.sales.GoodsEditRepository;
 import shopping.main.millions.repository.sales.GoodsImageRepository;
+import shopping.main.millions.repository.sales.GoodsStockRepository;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.time.LocalDateTime;
 import java.util.*;
 
 
@@ -35,8 +40,10 @@ public class GoodsSaveService {
     private final GoodsEditRepository goodsEditRepository;
     private final AmazonS3Client amazonS3Client;
     private final GoodsImageRepository goodsImageRepository;
+    private final ProductRepository productRepository;
     private final MemberRepository memberRepository;
-
+    private final CategoryRepository categoryRepository;
+    private final GoodsStockRepository goodsStockRepository;
     @Value("${cloud.aws.s3.goods-bucket}")
     private String bucketName;
 
@@ -58,6 +65,7 @@ public class GoodsSaveService {
     //진짜 삭제 맨
     public void deleteFile(String fileName) {
         amazonS3Client.deleteObject(new DeleteObjectRequest(bucketName, fileName));
+
     }
 
     /**
@@ -67,15 +75,23 @@ public class GoodsSaveService {
      */
 
     @Transactional
-    public ResponseEntity<Map<String, String>> editItem(GoodsSaveDto goodsSaveDto, List<MultipartFile> imageFile, String userId) {
+    public ResponseEntity<Map<String, String>> editItem (GoodsSaveDto goodsSaveDto, List<MultipartFile> imageFile, String userId) {
+        //ㄹㅇ.. 레파지토리로 id불러오는거 진짜 대단하시네요 존경's 전혀 생각 못했었는데 ;;; 무조건 entity 타고 넘어가서 불러올생각만했지
+        CategoryEntity categoryEntity = categoryRepository.findByCategoryName(goodsSaveDto.getCategoryName()).get();
+        //이건 디비에 저장되어 있는걸 가져온 entity예영 그럼 이 entity에는 id값도 들어있죵 저장되어있는걸
+        MemberEntity memberEntity = (memberRepository.findById(Long.valueOf(userId)).get());
 
+        ProductEntity goodsSaveEntity = ProductEntity.builder()
+                .productName(goodsSaveDto.getProductName())
+                .productPrice(goodsSaveDto.getProductPrice())
+                .memberEntity(memberEntity)
+                .categoryEntity(categoryEntity) // 그대로 넣어주는거예영 물품 등록을 하는데 어떻게 디비에 저장되있는 값을 불러오는지가 궁금해용
+                .build();
 
+        ProductEntity productEntity = goodsEditRepository.save(goodsSaveEntity);
 
-        List<ProductEntity> byMemberEntityUserId = goodsEditRepository.findProductsByUserId(Long.valueOf(userId));
-        List<MemberEntity> byProductEntityUserId = goodsEditRepository.findMemberEntityAndMemberEntity_UserId(Long.valueOf(userId));
-
-        byMemberEntityUserId.equals(byProductEntityUserId);
         List<String> goodsImgFile = new ArrayList<>();
+
         for (MultipartFile multipartFile : imageFile) {
 
             String fileName = multipartFile.getOriginalFilename();
@@ -95,9 +111,11 @@ public class GoodsSaveService {
                         .productImageSave(accessUrl)
                         .productImageOriginName(fileName)
                         .productImage(storedName)
+                        .productEntity(productEntity)
                         .build());
 
-
+                accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
+                System.out.println(accessUrl);
 
             } catch (IOException e) {
                 throw new RuntimeException();
@@ -107,29 +125,20 @@ public class GoodsSaveService {
 
         }
 
-        List<GoodsStockEntity> goodsStockEntityList = new ArrayList<>();
         for (StockSaveDto stockSaveDto : goodsSaveDto.getStockOption()) {
-            GoodsStockEntity goodsStockEntity = GoodsStockEntity.builder()
+            GoodsStockEntity goodsStockEntity =  GoodsStockEntity.builder()
                     .stockColor(stockSaveDto.getStockColor())
                     .stockQuantity(stockSaveDto.getStockQuantity())
                     .stockSize(stockSaveDto.getStockSize())
+                    .productEntity(productEntity)
                     .build();
-            goodsStockEntityList.add(goodsStockEntity);
+            goodsStockRepository.save(goodsStockEntity);
         }
-
-        //Client에 값을 받은 data를 entity로 변환
-        ProductEntity goodsSaveEntity = ProductEntity.builder()
-                .productName(goodsSaveDto.getProductName())
-                .productPrice(goodsSaveDto.getProductPrice())
-                .goodsStockEntityList(goodsStockEntityList)
-                .build();
-
-        Long productId = goodsEditRepository.save(goodsSaveEntity).getProductId();
 
         // 변환 후 data를 db에 저장
         Map<String, String> result = new HashMap<>();
 
-        if (productId > 0) {
+        if (productEntity.getProductId() > 0) {
             result.put("message", "상품등록 등록 완료");
             return ResponseEntity.status(200).body(result);
         } else {
@@ -147,8 +156,9 @@ public class GoodsSaveService {
     //why? JPA가 더티체킹(변경감지)을 수행하지 않아서 성능을 향상 시킬 수 있음
     @Transactional(readOnly = true)
     public ResponseEntity<Map<String, String>> modifyItem(GoodsModifyDto modifyDto, Long productId, String userId,
-                                                          StockSaveDto stockSaveDto) {  //stock도 이하 동문입니다.
-        // 수정같은경우 이미지가 변경될수도있고 변경이 안될수도 있으니 이부분도 체크하는것이 필요할듯 싶습니당(작업하실내용)
+                                                          StockSaveDto stockSaveDto) {
+//        // 수정같은경우 이미지가 변경될수도있고 변경이 안될수도 있으니 이부분도 체크하는것이 필요할듯 싶습니당(작업하실내용)
+
         Map<String, String> result = new HashMap<>();
         // 상품정보를 가져옴
         Optional<ProductEntity> updateId = goodsEditRepository.findById(productId);
@@ -186,11 +196,11 @@ public class GoodsSaveService {
                     for (MultipartFile newImageFile : multipartFiles) {
                         String origin = newImageFile.getOriginalFilename();
                         //기존 이미지와 새 이미지를 비교하여 삭제
-                        for (GoodsImageEntity goodsImageEntity : goodsImageEntityList) {
-                            String oldOrigin = goodsImageEntity.getProductImageOriginName();
+                        for (GoodsImageEntity goodsImage : goodsImageEntityList) {
+                            String oldOrigin = goodsImage.getProductImageOriginName();
                             //기존 이미지의 오리지널 이름이 새 이미지 리스트에 없으면 삭제
                             if (!newImageOrigin.contains(oldOrigin)) {
-                                String storageName = goodsImageEntity.getProductImageSave();
+                                String storageName = goodsImage.getProductImageSave();
                                 amazonS3Client.deleteObject(new DeleteObjectRequest(bucketName, storageName));
                             }
 
@@ -265,75 +275,45 @@ public class GoodsSaveService {
         }
         result.put("message", "상품 수정 완료");
         return ResponseEntity.status(200).body(result);
+
     }
 
-
-    //저 String userId때문에  {} 잘못 설정하면 저게..말을 안듣더라고용 어 갑자기 되네
-
-
     //판매자 상품 전체 조회
-    //원래 여기(String userId) 빨간색으로 되어있어서 한참을 찾았거든요 그래서 { } 잘못 설정했구나
-    //라는걸 알았고 지금 { } 맞추는 과정에 저기서 return 적으라는 곳에서 막혔씁니다 ㅜ . ㅜ
     public ResponseEntity<?> findGoods(String userId) {
-        //안녕하세요? 편안한 날이 아닌게 아쉽네요 안녕못하는데영 ㅎㅎ
-        List<ProductEntity> productEntityList = goodsEditRepository.findAll();
+        List<ProductEntity> productEntityList = productRepository.findByMemberEntity_UserId(Long.valueOf(userId));
+        List<ProductListResponseDto> productListResponseDtoList = new ArrayList<>();
+       for(ProductEntity productEntity : productEntityList){
+           List<StockSaveDto> stockSaveDtoList = new ArrayList<StockSaveDto>();
+           for(GoodsStockEntity goodsStockEntity : productEntity.getGoodsStockEntityList()){
+               StockSaveDto stockSaveDto = StockSaveDto.builder()
+                       .stockColor(goodsStockEntity.getStockColor())
+                       .stockSize(goodsStockEntity.getStockSize())
+                       .stockQuantity(goodsStockEntity.getStockQuantity())
+                       .build();
+               stockSaveDtoList.add(stockSaveDto);
+           }
+           List<GoodsImageDto> goodsImageDtoList = new ArrayList<GoodsImageDto>();
+           for(GoodsImageEntity goodsImageEntity: productEntity.getGoodsImageEntityList()) {
+               GoodsImageDto goodsImageDto = GoodsImageDto.builder()
+                       .imageId(goodsImageEntity.getImageId())
+                       .productId(goodsImageEntity.getProductEntity().getProductId())
+                       .productImageSave(goodsImageEntity.getProductImageSave())
+                       .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+                       .productImage(goodsImageEntity.getProductImage())
+                       .build();
+               goodsImageDtoList.add(goodsImageDto);
+           }
 
-
-//        List<MemberEntity> memberEntities = goodsEditRepository.findMemberEntityAndMemberEntity_UserId(Long.valueOf(userId));
-//
-//        // 이제 이 리스트를 dto타입으로 변환하는 작업을 하시면 될거같습니다^_^ b
-//        List<GoodsCheckDto> checkDtoList = new ArrayList<>();
-//        int count = 0;
-//        for (MemberEntity memberEntity :  memberEntities) {
-//            //안녕하세요 ㅠ?
-//            List<ProductEntity> productEntityList = memberEntity.getProductEntityList();
-//
-//            for (ProductEntity productEntity : productEntityList) {
-//                GoodsCheckDto productDetail = GoodsCheckDto.builder()
-//                        .productId(productEntity.getProductId())
-//                        .productName(productEntity.getProductName())
-//                        .productPrice(productEntity.getProductPrice())
-//                        .categoryName(productEntity.getCategoryEntity())
-//                        .build();
-//
-//                checkDtoList.add(productDetail);
-//
-//                //재고 조회 저 get 에는 뭐가 들어가야 될까..
-//                List<GoodsStockEntity> stockDetailList = memberEntity.getProductEntityList().get().getGoodsStockEntityList();
-//
-//                for (GoodsStockEntity stockEntity : stockDetailList) {
-//
-//                    GoodsCheckDto stockDetail = GoodsCheckDto.builder()
-//                            .stockSaveDto(StockSaveDto.builder()
-//                                    .stockColor(stockEntity.getStockColor())
-//                                    .stockSize(stockEntity.getStockSize())
-//                                    .stockQuantity(stockEntity.getStockQuantity())
-//                                    .build())
-//                            .build();
-//
-//
-//
-//                    checkDtoList.add(stockDetail);
-//                }
-//            }
-//            //이미지..는 어떻게 또 찾아야될까 ...
-//            List<GoodsImageEntity> imageDetailList = memberEntity.getProductEntityList().get().getGoodsImageEntityList();
-//
-//            for (GoodsImageEntity imageEntity : imageDetailList  ) {
-//
-//                GoodsCheckDto imageDto = GoodsCheckDto.builder()
-//                        .imageFile()
-//                        .build();
-//
-//                checkDtoList.add(imageDto);
-//
-//            }
-//            //검색 을 뭐 어떻게 해야되는거냐 !! 으악 !
-//            productDetail.setStockSaveDto((StockSaveDto) stockDetailList);
-//            productDetail.setImageFile(goodsImageDtoList);
-//        }
-//        return ResponseEntity.status(200).body(checkDtoList);
-
+           ProductListResponseDto productListResponseDto = ProductListResponseDto.builder()
+                   .productName(productEntity.getProductName())
+                   .categoryName(productEntity.getProductName())
+                   .productPrice(productEntity.getProductPrice())
+                   .stockOption(stockSaveDtoList)
+                   .imageFileList(goodsImageDtoList)
+                   .build();
+           productListResponseDtoList.add(productListResponseDto);
+       }
+       return ResponseEntity.status(200).body(productListResponseDtoList);
     }
 }
 

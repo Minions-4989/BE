@@ -17,6 +17,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class ProductService {
     private final ProductRepository productRepository;
+
     private final CategoryRepository categoryRepository;
 
     public Page<ProductDto> getProductsByPage(Pageable pageable) {
@@ -25,7 +26,6 @@ public class ProductService {
                 .productId(product.getProductId())
                 .productName(product.getProductName())
                 .productPrice(product.getProductPrice())
-                .productDate(product.getProductDate())
                 .build());
         return productDto;
     }
@@ -34,7 +34,7 @@ public class ProductService {
         // productId에 해당하는　productEntity 가져오기
         Optional<ProductEntity> byId = productRepository.findById(id);
 
-        if(byId.isPresent()) {
+        if (byId.isPresent()) {
             ProductEntity productEntity = byId.get();
 
             // entity -> dto
@@ -43,21 +43,21 @@ public class ProductService {
                     .productId(productEntity.getProductId())
                     .productName(productEntity.getProductName())
                     .productPrice(productEntity.getProductPrice())
-                    .productDate(productEntity.getProductDate())
                     .build();
 
             return ResponseEntity.status(200).body(productDTO);
-        }else{
+        } else {
             return ResponseEntity.status(400).body("상품이 없습니다");
 
         }
     }
 
+
     public Page<ProductDto> getProductsByCategory(Pageable pageable, String categoryName) {
 
         Optional<CategoryEntity> categoryEntityOptional = categoryRepository.findByCategoryName(categoryName);
 
-        if(categoryEntityOptional.isPresent()) {
+        if (categoryEntityOptional.isPresent()) {
             CategoryEntity categoryEntity = categoryEntityOptional.get();
 
             Page<ProductEntity> products = productRepository.findAllByCategoryEntityOrderByProductId(categoryEntity, pageable);
@@ -69,9 +69,19 @@ public class ProductService {
                     .productDate(product.getProductDate())
                     .build());
             return productDtoPage;
-        }
-        else{
+        } else {
             return null;
         }
     }
-}
+
+        public Page<ProductDto> getProductsByCategory (Pageable pageable, Long categoryId){
+            Page<ProductEntity> products = productRepository.findAllByCategoryEntityOrderByProductId(categoryId, pageable);
+            Page<ProductDto> productDto = products.map(product -> ProductDto.builder()
+                    .productId(product.getProductId())
+                    .productName(product.getProductName())
+                    .productPrice(product.getProductPrice())
+                    .build());
+            return productDto;
+
+        }
+    }

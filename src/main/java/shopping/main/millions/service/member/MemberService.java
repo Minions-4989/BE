@@ -6,12 +6,14 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import shopping.main.millions.dto.member.sighUp.SighUpDto;
+import shopping.main.millions.entity.member.AddressEntity;
 import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.jwt.TokenProvider;
 import shopping.main.millions.jwt.dto.LoginTokenSaveDto;
 import shopping.main.millions.jwt.dto.Token;
 import shopping.main.millions.jwt.entity.RefreshToken;
 import shopping.main.millions.jwt.repository.JwtRepository;
+import shopping.main.millions.repository.member.AddressRepository;
 import shopping.main.millions.repository.member.MemberRepository;
 
 import java.util.HashMap;
@@ -22,6 +24,7 @@ import java.util.regex.Pattern;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
+    private final AddressRepository addressRepository;
     private final MemberImageSaveService memberImageSaveService;
     private final TokenProvider tokenProvider;
     private final JwtRepository jwtRepository;
@@ -40,14 +43,19 @@ public class MemberService {
                             MemberEntity memberEntity = MemberEntity.builder()
                                     .userEmail(sighUp.getEmail())
                                     .userPassword(encPassword)
-                                    .addressZipcode(sighUp.getAddressZipcode())
-                                    .address(sighUp.getAddress())
-                                    .addressDetail(sighUp.getAddressDetail())
                                     .telNumber(sighUp.getTelNumber())
                                     .userName(sighUp.getName())
                                     .gender(sighUp.getGender())
                                     .profileImage("https://s3-minions-image-bucket.s3.ap-northeast-2.amazonaws.com/default_profile_img.gif")
+                                    .status(true)
                                     .build();
+
+                            AddressEntity addressEntity = AddressEntity.builder()
+                                    .addressZipcode(sighUp.getAddressZipcode())
+                                    .address(sighUp.getAddress())
+                                    .addressDetail(sighUp.getAddressDetail())
+                                    .build();
+                            memberEntity.setAddressEntity(addressEntity);
                             Long userId = memberRepository.save(memberEntity).getUserId();
                             if (userId > 0) {
                                 response.put("success", true);
@@ -62,17 +70,25 @@ public class MemberService {
                             BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
                             String encPassword = bCryptPasswordEncoder.encode(sighUp.getPassword());
                             String saveUrl = memberImageSaveService.imageSave(sighUp.getProfileImage());
-                            MemberEntity memberEntity = MemberEntity.builder()
-                                    .userEmail(sighUp.getEmail())
-                                    .userPassword(encPassword)
+                            AddressEntity addressEntity = AddressEntity.builder()
                                     .addressZipcode(sighUp.getAddressZipcode())
                                     .address(sighUp.getAddress())
                                     .addressDetail(sighUp.getAddressDetail())
+                                    .build();
+                            AddressEntity savedAddress = addressRepository.save(addressEntity);
+
+
+                            MemberEntity memberEntity = MemberEntity.builder()
+                                    .userEmail(sighUp.getEmail())
+                                    .userPassword(encPassword)
                                     .telNumber(sighUp.getTelNumber())
                                     .userName(sighUp.getName())
                                     .gender(sighUp.getGender())
                                     .profileImage(saveUrl)
+                                    .addressEntity(savedAddress)
+                                    .status(true)
                                     .build();
+
                             Long userId = memberRepository.save(memberEntity).getUserId();
                             if (userId > 0) {
                                 response.put("success", true);

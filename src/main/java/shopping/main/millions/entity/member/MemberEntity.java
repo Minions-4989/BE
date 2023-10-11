@@ -23,14 +23,8 @@ public class MemberEntity {
     private String userEmail;
     @Column(name = "user_password" , nullable = false)
     private String userPassword;
-    @Column(name = "address_zipcode", nullable = false)
-    private String addressZipcode;
-    @Column(nullable = false)
-    private String address;
     @Column(name = "user_name")
     private String userName;
-    @Column(name = "address_detail" , nullable = false)
-    private String addressDetail;
     @Column(name = "tel_number" , nullable = false, unique = true)
     private String telNumber;
     @Column(nullable = false)
@@ -39,13 +33,18 @@ public class MemberEntity {
     private String profileImage;
     //사용자 활성화 상태
     @Column(name = "status")
-    @ColumnDefault("true")
     private Boolean status;
+
+    public void setAddressEntity(AddressEntity addressEntity) {
+        this.addressEntity = addressEntity;
+    }
 
     @OneToMany(mappedBy = "memberEntity",cascade = CascadeType.REMOVE,orphanRemoval = true,fetch = FetchType.LAZY)
     private List<ProductEntity> productEntityList;
 
     @OneToOne(mappedBy = "memberEntity", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private CartEntity cartEntity;
-
+    @OneToOne
+    @JoinColumn(name = "address_id")
+    private AddressEntity addressEntity;
 }

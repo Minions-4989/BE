@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class OrderPaymentEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_payment_id")
     private Long orderPaymentId; // 주문 번호
 

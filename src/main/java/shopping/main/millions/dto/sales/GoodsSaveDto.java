@@ -19,6 +19,7 @@ import java.util.List;
 @ToString
 public class GoodsSaveDto {
 //근데 이건 물품등록인가용?
+    private String productId; // 상품 id
 
     private String productName; // 품목 이름
 

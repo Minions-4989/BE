@@ -21,6 +21,7 @@ public interface GoodsEditRepository extends JpaRepository<ProductEntity,Long > 
         @Query("SELECT p FROM ProductEntity p WHERE p.memberEntity.userId = :userId")
         List<ProductEntity> findProductsByUserId(@Param("userId") Long userId);
 
-        List<MemberEntity> findMemberEntityAndMemberEntity_UserId(Long userId);
+        List<ProductEntity> findByMemberEntity_UserId(Long id);
+
 }
 

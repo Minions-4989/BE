@@ -44,6 +44,7 @@ public class OrderService {
                 .cardCvc(orderDto.getCardCvc())
                 .cardExpirationPeriod(orderDto.getCardExpirationPeriod())
                 .totalPrice(orderDto.getTotalPrice())
+                .deliveryDate(orderDto.getOrderDate())
                 .build();
         orderPaymentRepository.save(orderPaymentEntity);
         return ResponseEntity.ok("저장 완료");

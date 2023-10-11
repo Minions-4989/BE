@@ -34,12 +34,13 @@ public class OrderController {
     public ResponseEntity<?> orderInfo (@RequestBody OrderDto orderDto, HttpServletRequest request) {
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
-//        orderService.saveInfo(orderDto);
+        orderService.saveUser(orderDto);
+        orderService.saveUserPayment(orderDto);
         return null;
     }
 
-    // Patch - stock db정보 변경
+    // PutMapping - dto받아서 거기상에 있는 상품 리스트 통해,
+    // 구매상품 OrderEntity에 저장, Stock 변경, CartProduct 삭제
 
-    //
+    // 느낌표 하나만 붙여주세요ㄴ 네~!
 }
-// 주문 후 재고 줄이기, 프론트 입력 값 디비 저장

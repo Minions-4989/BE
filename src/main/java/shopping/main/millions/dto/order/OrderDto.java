@@ -23,6 +23,8 @@ public class OrderDto {
 
     private Integer totalPrice;
 
+    private LocalDateTime orderDate;
+
     // 수령인 정보
     private String telNumber;
 
@@ -38,7 +40,4 @@ public class OrderDto {
 
     // 물품 정보
     private List<CartProductDto> cartProductDtoList;
-
-    // 오더 정보
-    private LocalDateTime orderDate;
 }

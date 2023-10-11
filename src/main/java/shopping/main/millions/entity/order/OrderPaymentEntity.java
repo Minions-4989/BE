@@ -30,8 +30,8 @@ public class OrderPaymentEntity {
     @Column(name = "total_price")
     private Integer totalPrice; // 결제 총 금액
 
-    @Column(name = "delivery_date")
-    private LocalDateTime deliveryDate; // 구매 날짜
+    @Column(name = "order_date")
+    private LocalDateTime orderDate; // 구매 날짜
 
     @ManyToOne
     @JoinColumn(name = "user_order_id")

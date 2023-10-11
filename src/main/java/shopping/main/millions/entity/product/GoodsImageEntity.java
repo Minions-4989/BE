@@ -2,13 +2,16 @@ package shopping.main.millions.entity.product;
 
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 
 @Entity
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Getter
-@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+@Getter @Setter
+@SuperBuilder
 @Table(name = "goods_image") // 테이블이름을 image가 아닌 물품이미지 이름으로 수정하는게 좋을듯싶어용 ex) goodsimage
 public class GoodsImageEntity {
 
@@ -29,13 +32,18 @@ public class GoodsImageEntity {
     private String productImageSave;
     // ManyToOne으로 물품과 연관관계가 필요할수도?
 
+    @Transient
+    private MultipartFile productImageFile; // MultipartFile 필드
+
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
 
     @Builder
-    public GoodsImageEntity(Long imageId, String productImage) {
-        this.imageId = imageId;
+    public GoodsImageEntity(String productImage, String productImageOriginName, String productImageSave) {
         this.productImage = productImage;
+        this.productImageOriginName = productImageOriginName;
+        this.productImageSave = productImageSave;
     }
 }
+

@@ -8,6 +8,10 @@ import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 import shopping.main.millions.entity.product.ProductEntity;
 
+import lombok.*;
+
+
+
 import javax.persistence.Column;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -17,6 +21,8 @@ import java.time.LocalDateTime;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class GoodsImageDto {
     private Long imageId;
 

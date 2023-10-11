@@ -1,7 +1,6 @@
 package shopping.main.millions.service.sales;
 
 import com.amazonaws.services.s3.AmazonS3Client;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -13,13 +12,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
-import shopping.main.millions.dto.sales.GoodsImageDto;
-import shopping.main.millions.dto.sales.GoodsModifyDto;
-import shopping.main.millions.dto.sales.GoodsSaveDto;
-import shopping.main.millions.dto.sales.StockSaveDto;
+import shopping.main.millions.dto.sales.*;
 import shopping.main.millions.entity.category.CategoryEntity;
+import shopping.main.millions.entity.member.MemberEntity;
+import shopping.main.millions.entity.product.GoodsImageEntity;
 import shopping.main.millions.entity.product.GoodsStockEntity;
 import shopping.main.millions.entity.product.ProductEntity;
+import shopping.main.millions.repository.member.MemberRepository;
 import shopping.main.millions.repository.sales.GoodsEditRepository;
 import shopping.main.millions.repository.sales.GoodsImageRepository;
 
@@ -28,6 +27,7 @@ import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.util.*;
 
+
 @RequiredArgsConstructor
 @Service
 public class GoodsSaveService {
@@ -35,20 +35,19 @@ public class GoodsSaveService {
     private final GoodsEditRepository goodsEditRepository;
     private final AmazonS3Client amazonS3Client;
     private final GoodsImageRepository goodsImageRepository;
+    private final MemberRepository memberRepository;
 
     @Value("${cloud.aws.s3.goods-bucket}")
     private String bucketName;
 
-// 왜 키보드가 멈추셨죵?
-// 보고있는데 봐도 모르것어요
-    //ㅠㅠ 누구 한놈좀 도와주고 보죵
+
     // 먼저 파일 업로드 시, 파일명을 난수화하기 위해 random으로 돌립니다.
-    private String createFileName(String fileName){
+    private String createFileName(String fileName) {
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
     }
 
     // file 형식이 잘못된 경우를 확인하기 위해 만들어진 로직이며, 파일 타입과 상관없이 업로드할 수 있게 하기 위해 .의 존재 유무만 판단하였습니다.
-    private String getFileExtension(String filename){
+    private String getFileExtension(String filename) {
         try {
             return filename.substring(filename.lastIndexOf("."));
         } catch (StringIndexOutOfBoundsException e) {
@@ -68,33 +67,49 @@ public class GoodsSaveService {
      */
 
     @Transactional
-    public ResponseEntity<Map<String, String>> editItem(GoodsSaveDto goodsSaveDto, List<MultipartFile> imageFile) {
+    public ResponseEntity<Map<String, String>> editItem(GoodsSaveDto goodsSaveDto, List<MultipartFile> imageFile, String userId) {
 
+
+
+        List<ProductEntity> byMemberEntityUserId = goodsEditRepository.findProductsByUserId(Long.valueOf(userId));
+        List<MemberEntity> byProductEntityUserId = goodsEditRepository.findMemberEntityAndMemberEntity_UserId(Long.valueOf(userId));
+
+        byMemberEntityUserId.equals(byProductEntityUserId);
         List<String> goodsImgFile = new ArrayList<>();
         for (MultipartFile multipartFile : imageFile) {
 
             String fileName = multipartFile.getOriginalFilename();
 
             try {
+                //이미지 객체 생성
                 ObjectMetadata objectMetadata = new ObjectMetadata();
                 objectMetadata.setContentType(multipartFile.getContentType());
                 objectMetadata.setContentLength(multipartFile.getInputStream().available());
                 String storedName = createFileName(fileName);
-                amazonS3Client.putObject(bucketName, storedName, multipartFile.getInputStream(), objectMetadata);
+                amazonS3Client.putObject(new PutObjectRequest(bucketName, storedName, multipartFile.getInputStream(), objectMetadata));
 
                 String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
                 System.out.println(accessUrl);
+                //이미지 저장
+                goodsImageRepository.save(GoodsImageEntity.builder()
+                        .productImageSave(accessUrl)
+                        .productImageOriginName(fileName)
+                        .productImage(storedName)
+                        .build());
+
+
 
             } catch (IOException e) {
                 throw new RuntimeException();
             }
-            goodsImgFile.add(fileName);
-        }
 
+            goodsImgFile.add(fileName);
+
+        }
 
         List<GoodsStockEntity> goodsStockEntityList = new ArrayList<>();
         for (StockSaveDto stockSaveDto : goodsSaveDto.getStockOption()) {
-            GoodsStockEntity goodsStockEntity =  GoodsStockEntity.builder()
+            GoodsStockEntity goodsStockEntity = GoodsStockEntity.builder()
                     .stockColor(stockSaveDto.getStockColor())
                     .stockQuantity(stockSaveDto.getStockQuantity())
                     .stockSize(stockSaveDto.getStockSize())
@@ -106,7 +121,6 @@ public class GoodsSaveService {
         ProductEntity goodsSaveEntity = ProductEntity.builder()
                 .productName(goodsSaveDto.getProductName())
                 .productPrice(goodsSaveDto.getProductPrice())
-                .productDate(goodsSaveDto.getProductDate())
                 .goodsStockEntityList(goodsStockEntityList)
                 .build();
 
@@ -115,11 +129,11 @@ public class GoodsSaveService {
         // 변환 후 data를 db에 저장
         Map<String, String> result = new HashMap<>();
 
-        if(productId > 0){
-            result.put("message","상품등록 등록 완료");
+        if (productId > 0) {
+            result.put("message", "상품등록 등록 완료");
             return ResponseEntity.status(200).body(result);
-        }else {
-            result.put("message","상품등록 실패");
+        } else {
+            result.put("message", "상품등록 실패");
             return ResponseEntity.status(400).body(result);
         }
 
@@ -132,49 +146,205 @@ public class GoodsSaveService {
     //상품 데이터를 읽어오는 트랙잭션을 읽기전용으로 설정
     //why? JPA가 더티체킹(변경감지)을 수행하지 않아서 성능을 향상 시킬 수 있음
     @Transactional(readOnly = true)
-    public ResponseEntity<Map<String, String>> modifyItem(GoodsModifyDto modifyDto, Long productId, Long
-            UserId, StockSaveDto stockSaveDto, GoodsImageDto goodsImageDto) {
-
-        Map<String, String> map = new HashMap<>();
-
+    public ResponseEntity<Map<String, String>> modifyItem(GoodsModifyDto modifyDto, Long productId, String userId,
+                                                          StockSaveDto stockSaveDto) {  //stock도 이하 동문입니다.
+        // 수정같은경우 이미지가 변경될수도있고 변경이 안될수도 있으니 이부분도 체크하는것이 필요할듯 싶습니당(작업하실내용)
+        Map<String, String> result = new HashMap<>();
+        // 상품정보를 가져옴
         Optional<ProductEntity> updateId = goodsEditRepository.findById(productId);
 
         if (updateId.isPresent()) {
             ProductEntity productEntity = updateId.get();
-            //product modify
-            if (productEntity.getProductId().equals(UserId)) {
-                productEntity.setCategoryEntity(modifyDto.getCategoryName());
+
+            //product modify user_id와 로그인한 user_id 가 같은지 확인(수정 권한 확인)
+            if (productEntity.getMemberEntity().getUserId().equals(Long.valueOf(userId))) {
+                //상품 정보 수정
                 productEntity.setProductName(modifyDto.getProductName());
                 productEntity.setProductPrice(modifyDto.getProductPrice());
-                //stock option modify
+
+                //stock 수정
                 List<GoodsStockEntity> modifyStock = productEntity.getGoodsStockEntityList();
+                int count = 0;
                 for (GoodsStockEntity goodsStockEntity : modifyStock) {
-                    goodsStockEntity.setStockColor(stockSaveDto.getStockColor());
+                    //재고 수량 저장
                     goodsStockEntity.setStockQuantity(stockSaveDto.getStockQuantity());
+                    //재고
                     goodsStockEntity.setStockSize(stockSaveDto.getStockSize());
+                    //색상
+                    goodsStockEntity.setStockColor(stockSaveDto.getStockColor());
+                    modifyStock.set(count, goodsStockEntity);
+                    count++;
                 }
+
+                // 수정할때 사진이 있나 없나 체크
+                if (modifyDto.getImageFile() != null) {
+                    List<MultipartFile> multipartFiles = modifyDto.getImageFile();
+                    //새로 만듬
+                    List<String> newImageOrigin = new ArrayList<>();
+                    int imageCount = 0;
+                    List<GoodsImageEntity> goodsImageEntityList = goodsImageRepository.findByProductEntityProductId(productId);
+                    for (MultipartFile newImageFile : multipartFiles) {
+                        String origin = newImageFile.getOriginalFilename();
+                        //기존 이미지와 새 이미지를 비교하여 삭제
+                        for (GoodsImageEntity goodsImageEntity : goodsImageEntityList) {
+                            String oldOrigin = goodsImageEntity.getProductImageOriginName();
+                            //기존 이미지의 오리지널 이름이 새 이미지 리스트에 없으면 삭제
+                            if (!newImageOrigin.contains(oldOrigin)) {
+                                String storageName = goodsImageEntity.getProductImageSave();
+                                amazonS3Client.deleteObject(new DeleteObjectRequest(bucketName, storageName));
+                            }
+
+                        }
+//                            String origin1 = modifyDto.getImageFile().get(imageCount).getOriginalFilename();
+//                            String oldOrigin = goodsImageEntity.getProductImageOriginName();
+//                            if (origin.equals(oldOrigin)) {
+//                                imageCount++;
+//                            } else {
+//                                String storageName = goodsImageEntity.getProductImageSave();
+//                                amazonS3Client.deleteObject(new DeleteObjectRequest(bucketName, storageName));
+
+                    }
+
+
+                    //새 이미지 업로드 및 데이터베이스 업데이트
+                    for (MultipartFile newImageFile : multipartFiles) {
+                        String newFileName = newImageFile.getOriginalFilename();
+                        String newStoredName = createFileName(newFileName);
+                        //새 이미지업로드
+                        try {
+                            ObjectMetadata objectMetadata = new ObjectMetadata();
+                            objectMetadata.setContentType(newImageFile.getContentType());
+                            objectMetadata.setContentLength(newImageFile.getInputStream().available());
+                            amazonS3Client.putObject(new PutObjectRequest(bucketName, newStoredName, newImageFile.getInputStream(), objectMetadata));
+
+                            String newAccessUrl = amazonS3Client.getUrl(bucketName, newStoredName).toString();
+
+                            System.out.println(newAccessUrl);
+
+                            Optional<GoodsImageEntity> findId = goodsImageRepository.findById(modifyDto.getProductId());
+
+                            //이미지 정보 업데이트
+                            if (findId.isPresent()) {
+                                goodsImageRepository.save(GoodsImageEntity.builder()
+                                        .productImageSave(newAccessUrl)
+                                        .productImageOriginName(newFileName)
+                                        .productImage(newStoredName)
+                                        .build());
+                            }
+                        } catch (IOException e) {
+                            throw new RuntimeException("이미지 업로드 오류");
+                        }
+                    }
+
+                }
+
+                //이미지 수정
                 List<GoodsImageEntity> imageEntities = productEntity.getGoodsImageEntityList();
                 for (GoodsImageEntity imageEntity : imageEntities) {
-                    //이미지 오리지널 네임 저장
-                    imageEntity.setProductImageOriginName(goodsImageDto.getProductImageOriginName());
-                    //s3 주소 저장
-                    imageEntity.setProductImage(goodsImageDto.getProductImage());
-                    //이미지 s3에 저장될 네임 저장
-                    imageEntity.setProductImageSave(goodsImageDto.getProductImageSave());
+
+                    imageEntity = GoodsImageEntity.builder()
+                            //이미지 오리지널 네임 저장
+                            .productImage(imageEntity.getProductImage())
+                            //s3 주소 저장
+                            .productImageOriginName(imageEntity.getProductImageOriginName())
+                            //이미지 s3에 저장될 네임 저장
+                            .productImageSave(imageEntity.getProductImageSave())
+                            .build();
                 }
 
                 goodsEditRepository.save(productEntity);
 
-                map.put("message", "상품 수정 완료");
-                return ResponseEntity.status(200).body(map);
+//
             } else {
-                map.put("message", "상품 수정 권한이 없습니다.");
-                return ResponseEntity.status(403).body(map);
+                result.put("message", "상품 수정 권한이 없습니다.");
+                return ResponseEntity.status(403).body(result);
             }
         } else {
-            map.put("message", "상품을 찾을 수 없습니다.");
-            return ResponseEntity.status(404).body(map);
+            result.put("message", "상품을 찾을 수 없습니다.");
+            return ResponseEntity.status(404).body(result);
         }
+        result.put("message", "상품 수정 완료");
+        return ResponseEntity.status(200).body(result);
+    }
+
+
+    //저 String userId때문에  {} 잘못 설정하면 저게..말을 안듣더라고용 어 갑자기 되네
+
+
+    //판매자 상품 전체 조회
+    //원래 여기(String userId) 빨간색으로 되어있어서 한참을 찾았거든요 그래서 { } 잘못 설정했구나
+    //라는걸 알았고 지금 { } 맞추는 과정에 저기서 return 적으라는 곳에서 막혔씁니다 ㅜ . ㅜ
+    public ResponseEntity<?> findGoods(String userId) {
+        //안녕하세요? 편안한 날이 아닌게 아쉽네요 안녕못하는데영 ㅎㅎ
+        List<ProductEntity> productEntityList = goodsEditRepository.findAll();
+
+
+//        List<MemberEntity> memberEntities = goodsEditRepository.findMemberEntityAndMemberEntity_UserId(Long.valueOf(userId));
+//
+//        // 이제 이 리스트를 dto타입으로 변환하는 작업을 하시면 될거같습니다^_^ b
+//        List<GoodsCheckDto> checkDtoList = new ArrayList<>();
+//        int count = 0;
+//        for (MemberEntity memberEntity :  memberEntities) {
+//            //안녕하세요 ㅠ?
+//            List<ProductEntity> productEntityList = memberEntity.getProductEntityList();
+//
+//            for (ProductEntity productEntity : productEntityList) {
+//                GoodsCheckDto productDetail = GoodsCheckDto.builder()
+//                        .productId(productEntity.getProductId())
+//                        .productName(productEntity.getProductName())
+//                        .productPrice(productEntity.getProductPrice())
+//                        .categoryName(productEntity.getCategoryEntity())
+//                        .build();
+//
+//                checkDtoList.add(productDetail);
+//
+//                //재고 조회 저 get 에는 뭐가 들어가야 될까..
+//                List<GoodsStockEntity> stockDetailList = memberEntity.getProductEntityList().get().getGoodsStockEntityList();
+//
+//                for (GoodsStockEntity stockEntity : stockDetailList) {
+//
+//                    GoodsCheckDto stockDetail = GoodsCheckDto.builder()
+//                            .stockSaveDto(StockSaveDto.builder()
+//                                    .stockColor(stockEntity.getStockColor())
+//                                    .stockSize(stockEntity.getStockSize())
+//                                    .stockQuantity(stockEntity.getStockQuantity())
+//                                    .build())
+//                            .build();
+//
+//
+//
+//                    checkDtoList.add(stockDetail);
+//                }
+//            }
+//            //이미지..는 어떻게 또 찾아야될까 ...
+//            List<GoodsImageEntity> imageDetailList = memberEntity.getProductEntityList().get().getGoodsImageEntityList();
+//
+//            for (GoodsImageEntity imageEntity : imageDetailList  ) {
+//
+//                GoodsCheckDto imageDto = GoodsCheckDto.builder()
+//                        .imageFile()
+//                        .build();
+//
+//                checkDtoList.add(imageDto);
+//
+//            }
+//            //검색 을 뭐 어떻게 해야되는거냐 !! 으악 !
+//            productDetail.setStockSaveDto((StockSaveDto) stockDetailList);
+//            productDetail.setImageFile(goodsImageDtoList);
+//        }
+//        return ResponseEntity.status(200).body(checkDtoList);
+
     }
 }
+
+
+
+
+
+
+
+
+
+
+
 

@@ -8,9 +8,18 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import shopping.main.millions.dto.product.ProductDto;
+import shopping.main.millions.dto.sales.*;
 import shopping.main.millions.entity.product.ProductEntity;
+import shopping.main.millions.jwt.TokenProvider;
+import shopping.main.millions.service.member.MemberService;
 import shopping.main.millions.service.product.ProductService;
+import shopping.main.millions.service.sales.GoodsSaveService;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @RestController
@@ -19,6 +28,8 @@ import shopping.main.millions.service.product.ProductService;
 public class ProductController {
 
     private final ProductService productService;
+    private final GoodsSaveService goodsSaveService;
+    private final TokenProvider tokenProvider;
 
     //상품 페이지 조회
     @GetMapping("/list")
@@ -42,4 +53,38 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
+    //상품 등록
+    @PostMapping
+    public ResponseEntity<Map<String, String>> goodsEdit(@RequestPart("imageFile") List<MultipartFile> imageFile, @RequestPart("goodsSaveDto") GoodsSaveDto goodsSaveDto
+    ,HttpServletRequest request) {
+        String header = request.getHeader("X-AUTH-TOKEN");
+        String userId = tokenProvider.getUserPk(header);
+        System.out.println("imageFile = " + imageFile + ", goodsSaveDto = " + goodsSaveDto);
+
+        return goodsSaveService.editItem(goodsSaveDto, imageFile,userId);
+    }
+    //상품 수정
+    @PutMapping("/{productId}")
+    public ResponseEntity<Map<String, String>> goodsUpdate(@PathVariable("productId") Long productId,
+                                                           @RequestPart GoodsModifyDto modifyDto,
+                                                           @RequestPart StockSaveDto stockSaveDto,
+                                                           @RequestPart GoodsImageDto goodsImageDto,
+                                                           HttpServletRequest request) {
+        String header = request.getHeader("X-AUTH-TOKEN");
+        String userId = tokenProvider.getUserPk(header);
+       return goodsSaveService.modifyItem(modifyDto, productId, userId, stockSaveDto);
+
+    }
+    //상품 조회
+    @GetMapping
+    public ResponseEntity<?> goodsSearchList(HttpServletRequest request){
+
+        String header = request.getHeader("X-AUTH-TOKEN");
+        String userId = tokenProvider.getUserPk(header);
+
+
+    return goodsSaveService.findGoods(userId);
+    }
 }
+
+

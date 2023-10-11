@@ -26,8 +26,6 @@ public class GoodsSaveDto {
 
     private Integer productPrice; // 품목 가격
 
-    private Date productDate;// 품목 등록 날짜
-
     private List<StockSaveDto> stockOption;
 
 

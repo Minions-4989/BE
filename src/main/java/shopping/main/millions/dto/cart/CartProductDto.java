@@ -22,6 +22,6 @@ public class CartProductDto {
     private String cartProductColor;
     private Integer productPrice;
     private String productName;
-    private List<GoodsImageEntity> productImage;
+    private List<GoodsImageDto> productImage;
 
 }

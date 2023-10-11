@@ -34,6 +34,8 @@ public class OrderDto {
 
     private String addressDetail;
 
+    private String userEmail;
+
     // 물품 정보
     private List<CartProductDto> cartProductDtoList;
 

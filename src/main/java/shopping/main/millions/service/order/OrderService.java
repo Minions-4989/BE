@@ -30,6 +30,7 @@ public class OrderService {
                 .address(orderDto.getAddress())
                 .addressDetail(orderDto.getAddressDetail())
                 .addressZipcode(orderDto.getAddressZipcode())
+                .userEmail(orderDto.getUserEmail())
                 .build();
         //JPA의 JpaRepository 매개변수, 인터페이스 명이 일치한 지 확인하면 된다. bb
         userOrderRepository.save(userOrderEntity);

@@ -36,6 +36,9 @@ public class UserOrderEntity {
     @Column(name = "address_detail")
     private String addressDetail;
 
+    @Column(name = "user_email")
+    private String userEmail;
+
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private CartEntity cartEntity;

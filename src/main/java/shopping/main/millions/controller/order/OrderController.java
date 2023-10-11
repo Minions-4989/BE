@@ -20,7 +20,7 @@ public class OrderController {
     private final OrderService orderService;
     private final TokenProvider tokenProvider;
 
-    // Get - 장바구니에서 선택한 상품 정보 불러오기
+    // 장바구니에서 선택된 상품 불러오기
     @GetMapping("/list")
     public ResponseEntity<?> getCartItems(@RequestBody OrderGetDto orderGetDto, HttpServletRequest request) {
         // 장바구니 선택 상품목록을 dto로 받는다
@@ -29,18 +29,22 @@ public class OrderController {
         return ResponseEntity.ok(orderGetDto);
     }
 
-    // Post - 배송지, 결제정보 등 저장
+    // 수령인, 결제 관련 정보 저장
     @PostMapping("/payment")
     public ResponseEntity<?> orderInfo (@RequestBody OrderDto orderDto, HttpServletRequest request) {
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
         orderService.saveUser(orderDto);
         orderService.saveUserPayment(orderDto);
-        return null;
+        return ResponseEntity.ok("200");
     }
 
-    // PutMapping - dto받아서 거기상에 있는 상품 리스트 통해,
-    // 구매상품 OrderEntity에 저장, Stock 변경, CartProduct 삭제
-
-    // 느낌표 하나만 붙여주세요ㄴ 네~!
+    //
+    @PutMapping("/payment")
+    public ResponseEntity<?> orderItems(@RequestBody OrderDto orderDto, HttpServletRequest request) {
+        String header = request.getHeader("X-AUTH-TOKEN");
+        String userId = tokenProvider.getUserPk(header);
+        orderService.orderProcess(orderDto);
+        return null;
+    }
 }

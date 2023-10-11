@@ -40,13 +40,13 @@ public class GoodsStockEntity {
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
 
-    @Transient
-    private MultipartFile stockFile;
-
-    @Builder
-    public GoodsStockEntity(Long stockQuantity, String stockSize, String stockColor) {
-        this.stockQuantity = stockQuantity;
-        this.stockSize = stockSize;
-        this.stockColor = stockColor;
-    }
+//    @Transient
+//    private MultipartFile stockFile;
+//
+//    @Builder
+//    public GoodsStockEntity(Long stockQuantity, String stockSize, String stockColor) {
+//        this.stockQuantity = stockQuantity;
+//        this.stockSize = stockSize;
+//        this.stockColor = stockColor;
+//    }
 }

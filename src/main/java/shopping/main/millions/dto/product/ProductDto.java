@@ -18,6 +18,5 @@ public class ProductDto {
 
     private Integer productPrice;
 
-    private Date productDate;
 
 }

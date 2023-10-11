@@ -64,8 +64,6 @@ public class ProductEntity {
     private List<OrderEntity> orderEntityList;
 
 
-
-
 //    @Builder
 //    public ProductEntity(String productName, Integer productPrice, List<CartProductEntity> cartProductEntityList, List<GoodsStockEntity> goodsStockEntityList, CategoryEntity categoryEntity, List<GoodsImageEntity> goodsImageEntity) {
 //        this.productName = productName;

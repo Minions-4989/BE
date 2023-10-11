@@ -1,9 +1,11 @@
 package shopping.main.millions.entity.product;
 
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 
@@ -32,18 +34,18 @@ public class GoodsImageEntity {
     private String productImageSave;
     // ManyToOne으로 물품과 연관관계가 필요할수도?
 
-    @Transient
-    private MultipartFile productImageFile; // MultipartFile 필드
+//    @Transient
+//    private MultipartFile productImageFile; // MultipartFile 필드
 
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
 
-    @Builder
-    public GoodsImageEntity(String productImage, String productImageOriginName, String productImageSave) {
-        this.productImage = productImage;
-        this.productImageOriginName = productImageOriginName;
-        this.productImageSave = productImageSave;
-    }
+//    @Builder
+//    public GoodsImageEntity(String productImage, String productImageOriginName, String productImageSave) {
+//        this.productImage = productImage;
+//        this.productImageOriginName = productImageOriginName;
+//        this.productImageSave = productImageSave;
+//    }
 }
 

@@ -66,7 +66,6 @@ public class ProductService {
                     .productId(product.getProductId())
                     .productName(product.getProductName())
                     .productPrice(product.getProductPrice())
-                    .productDate(product.getProductDate())
                     .build());
             return productDtoPage;
         } else {
@@ -74,14 +73,14 @@ public class ProductService {
         }
     }
 
-        public Page<ProductDto> getProductsByCategory (Pageable pageable, Long categoryId){
-            Page<ProductEntity> products = productRepository.findAllByCategoryEntityOrderByProductId(categoryId, pageable);
-            Page<ProductDto> productDto = products.map(product -> ProductDto.builder()
-                    .productId(product.getProductId())
-                    .productName(product.getProductName())
-                    .productPrice(product.getProductPrice())
-                    .build());
-            return productDto;
-
-        }
+//        public Page<ProductDto> getProductsByCategory (Pageable pageable, Long categoryId){
+//            Page<ProductEntity> products = productRepository.findAllByCategoryEntityOrderByProductId(categoryId, pageable);
+//            Page<ProductDto> productDto = products.map(product -> ProductDto.builder()
+//                    .productId(product.getProductId())
+//                    .productName(product.getProductName())
+//                    .productPrice(product.getProductPrice())
+//                    .build());
+//            return productDto;
+//
+//        }
     }

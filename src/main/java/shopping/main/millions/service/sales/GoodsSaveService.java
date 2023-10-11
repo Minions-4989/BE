@@ -1,6 +1,7 @@
 package shopping.main.millions.service.sales;
 
 import com.amazonaws.services.s3.AmazonS3Client;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -10,11 +11,18 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 import shopping.main.millions.dto.sales.*;
 import shopping.main.millions.entity.category.CategoryEntity;
 import shopping.main.millions.entity.member.MemberEntity;
+import shopping.main.millions.entity.product.GoodsImageEntity;
+import shopping.main.millions.dto.sales.GoodsImageDto;
+import shopping.main.millions.dto.sales.GoodsModifyDto;
+import shopping.main.millions.dto.sales.GoodsSaveDto;
+import shopping.main.millions.dto.sales.StockSaveDto;
 import shopping.main.millions.entity.product.GoodsImageEntity;
 import shopping.main.millions.entity.product.GoodsStockEntity;
 import shopping.main.millions.entity.product.ProductEntity;
@@ -97,7 +105,8 @@ public class GoodsSaveService {
                         .productImage(storedName)
                         .build());
 
-
+                String accessUrl = amazonS3Client.getUrl(bucketName, storedName).toString();
+                System.out.println(accessUrl);
 
             } catch (IOException e) {
                 throw new RuntimeException();
@@ -107,9 +116,10 @@ public class GoodsSaveService {
 
         }
 
+
         List<GoodsStockEntity> goodsStockEntityList = new ArrayList<>();
         for (StockSaveDto stockSaveDto : goodsSaveDto.getStockOption()) {
-            GoodsStockEntity goodsStockEntity = GoodsStockEntity.builder()
+            GoodsStockEntity goodsStockEntity =  GoodsStockEntity.builder()
                     .stockColor(stockSaveDto.getStockColor())
                     .stockQuantity(stockSaveDto.getStockQuantity())
                     .stockSize(stockSaveDto.getStockSize())

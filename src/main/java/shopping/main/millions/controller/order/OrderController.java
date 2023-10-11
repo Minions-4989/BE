@@ -21,13 +21,25 @@ public class OrderController {
     private final OrderService orderService;
     private final TokenProvider tokenProvider;
 
-
+    // Get - 장바구니에서 선택한 상품 정보 불러오기
     @GetMapping("")
-    public ResponseEntity<?> getCartItems(@RequestParam("userId") String userId, HttpServletRequest request) {
-        // 주문 서비스의 메서드를 호출하여 장바구니 목록을 가져온다.
+    public ResponseEntity<?> getCartItems(@RequestBody OrderGetDto orderGetDto, HttpServletRequest request) {
+        // 장바구니 선택 상품목록을 dto로 받는다
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
-        List<CartProductDto> cartProductDtoList = orderService.getClass(userId);
-        return ResponseEntity.ok(cartProductDtoList);
+//        List<CartProductDto> cartProductDtoList = orderService.
+//        return ResponseEntity.ok(cartProductDtoList);
+        return null;
     }
 
+    // Post - 배송지, 결제정보 등 저장
+    @PostMapping("/payment")
+    public ResponseEntity<?> orderInfo (@RequestBody OrderDto orderDto, HttpServletRequest request) {
+        return null;
+    }
+
+    // Patch - stock db정보 변경
+
+    //
+}
+// 주문 후 재고 줄이기, 프론트 입력 값 디비 저장

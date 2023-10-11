@@ -24,7 +24,8 @@ public class CartEntity {
     @OneToMany(mappedBy = "cartEntity")
     private List<CartProductEntity> cartProductEntityList;
 
-    @OneToOne(mappedBy = "cartEntity" )
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
     private MemberEntity memberEntity;
 
     @OneToMany(mappedBy = "cartEntity")

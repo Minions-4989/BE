@@ -59,25 +59,32 @@ public class CartService {
         //전체 물품이 주문 가능한 것으로 판별 됨
 
         //카트 테이블에 데이터가 있는지 없는지 먼저 확인하고 있으면 카트아이디값을 가져오지만, 없으면 추가해줄것임
-        Optional<CartEntity> cartEntityOptional = cartRepository.findById(cartAddDto.getUserId());
-        Long cartId= 0L;
-        CartEntity cartEntity;
+        Optional<CartEntity> cartEntityOptional = cartRepository.findCartEntityByMemberEntity_UserId(cartAddDto.getUserId());
+        Long cartId;
+
         if(cartEntityOptional.isPresent()){
             //이미 사용자의 장바구니가 생성되었다.
             //카트 아이디 값 가져오기
-            cartEntity = cartEntityOptional.get();
-            cartId = cartEntity.getCartId();
+            CartEntity cartEntityExist = cartEntityOptional.get();
+            cartId = cartEntityExist.getCartId();
         }else{
             //장바구니에 아예 처음 담는 사람이다.
+            System.out.println(cartAddDto.getUserId());
             Optional<MemberEntity> memberEntityOptional = memberRepository.findById(cartAddDto.getUserId());
             MemberEntity memberEntity = memberEntityOptional.get();
-            cartEntity = CartEntity.builder().memberEntity(memberEntity).build();
-            cartRepository.save(cartEntity);
-            Optional<CartEntity> cartEntityOptionalNewCart = cartRepository.findById(memberEntity.getUserId());
+
+            CartEntity cartEntityNew = CartEntity.builder().memberEntity(memberEntity).build();
+            cartRepository.save(cartEntityNew);
+            //int result = cartRepository.insertNewCartId(memberEntity.getUserId());
+
+
+            Optional<CartEntity> cartEntityOptionalNewCart = cartRepository.findById(cartEntityNew.getCartId());
             CartEntity cartEntityNewCart = cartEntityOptionalNewCart.get();
             cartId = cartEntityNewCart.getCartId();
         }
         System.out.println(cartId);
+        Optional<CartEntity> cartEntityOptional1 = cartRepository.findById(cartId);
+        CartEntity cartEntity = cartEntityOptional1.get();
 
         //이제 모든 데이터를 CartProduct DB에 저장함
         for (OptionDto optionDto : optionList) {
@@ -86,6 +93,8 @@ public class CartService {
             Optional<ProductEntity> productEntityOptional = productRepository.findById(cartAddDto.getProductId());
             ProductEntity productEntity = productEntityOptional.get();
             cartProductInputDto.setProductEntity(productEntity);
+
+
 
             cartProductInputDto.setProductColor(optionDto.getProductColor());
             cartProductInputDto.setProductSize(optionDto.getProductSize());
@@ -127,7 +136,9 @@ public class CartService {
         public ResponseEntity<?> cartProductList (String userId){
             // userId를 통해 해당 CartEntity 찾기
             Optional<CartEntity> cartEntityById = cartRepository.findCartEntityByMemberEntity_UserId(Long.valueOf(userId));
+            if(!cartEntityById.isPresent())return ResponseEntity.status(400).body(null);
             CartEntity cartEntity = cartEntityById.get();
+
             Long cartId = cartEntity.getCartId();
 
             // cartId를 통해 해당 CartProductEntity 찾기
@@ -282,7 +293,11 @@ public class CartService {
                 Long cartProductId= cartProductList.get("cartProductId");
 
                 CartProductEntity cartProduct = cartProductRepository.findById(cartProductId).get();
-                if(cartProduct.getProductEntity().getMemberEntity().getUserId().equals(Long.valueOf(userId))){
+                //아 이거 등록한사람 아이디에요 물품등록한사람
+                // 지금 보시면 productentity에서 유저아이디를 가져오잖아요 근데 이값은? 등록한사람 아이디다.
+                // 이거 바꿔서 카트프로덕트엔티티 > 카트아이디 > 유저아이디 이렇게 가져와야합니다
+                // 여태까지는 계속 1번사람이어서 네네 아하,,     한번돌려보죵
+                if(cartProduct.getCartEntity().getMemberEntity().getUserId().equals(Long.valueOf(userId))){
                     // 사용자 ID와 선택한 카트 상품 ID 목록을 기반으로 삭제
                     cartProductRepository.deleteById(cartProductId);
                 }else {

@@ -3,6 +3,7 @@ package shopping.main.millions.service.cart;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.aspectj.weaver.ast.Literal;
+import org.springframework.data.relational.core.sql.In;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,7 +137,8 @@ public class CartService {
                     goodsStockRepository.findByStockSizeAndStockColorAndProductEntity_ProductId(
                     cartProductEntity.getCartProductSize(),
                     cartProductEntity.getCartProductColor(),
-                    cartProductEntity.getCartProductId()
+                    //카트 프로덕트 아이디가 아닌 프로덕트아이디로 검색
+                    cartProductEntity.getProductEntity().getProductId()
             );
             GoodsStockEntity goodsStockEntity = goodsStockById.get();
 

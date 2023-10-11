@@ -12,6 +12,7 @@ import shopping.main.millions.service.order.OrderService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @RestController
@@ -22,11 +23,12 @@ public class OrderController {
     private final TokenProvider tokenProvider;
 
     // Get - 장바구니에서 선택한 상품 정보 불러오기
-    @GetMapping("")
+    @GetMapping("/getOrderList")
     public ResponseEntity<?> getCartItems(@RequestBody OrderGetDto orderGetDto, HttpServletRequest request) {
         // 장바구니 선택 상품목록을 dto로 받는다
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
+
 //        List<CartProductDto> cartProductDtoList = orderService.
 //        return ResponseEntity.ok(cartProductDtoList);
         return null;

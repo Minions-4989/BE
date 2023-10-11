@@ -34,7 +34,7 @@ public class OrderService {
     public ResponseEntity<?> saveUser(OrderDto orderDto) {
         // Entity 변환 후 저장
         UserOrderEntity userOrderEntity = UserOrderEntity.builder()
-                .telNumber(orderDto.getTelNumber())
+                .tellNumber(orderDto.getTelNumber())
                 .userName(orderDto.getUserName())
                 .address(orderDto.getAddress())
                 .addressDetail(orderDto.getAddressDetail())
@@ -46,7 +46,7 @@ public class OrderService {
         return ResponseEntity.ok("저장 완료");
     }
 
-    public ResponseEntity<?> saveUserPayment(OrderDto orderDto){
+    public ResponseEntity<?> saveUserPayment(OrderDto orderDto,  UserOrderEntity userOrder){
         // Entity 변환 후 저장
         OrderPaymentEntity orderPaymentEntity = OrderPaymentEntity.builder()
                 .cardNum(orderDto.getCardNum())
@@ -54,6 +54,7 @@ public class OrderService {
                 .cardExpirationPeriod(orderDto.getCardExpirationPeriod())
                 .totalPrice(orderDto.getTotalPrice())
                 .orderDate(orderDto.getOrderDate())
+                .userOrderEntity(userOrder)
                 .build();
         orderPaymentRepository.save(orderPaymentEntity);
 

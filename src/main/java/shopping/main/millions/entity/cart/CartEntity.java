@@ -28,6 +28,6 @@ public class CartEntity {
     @JoinColumn(name = "user_id")
     private MemberEntity memberEntity;
 
-    @OneToMany(mappedBy = "cartEntity")
+    @OneToMany(mappedBy = "cartEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<UserOrderEntity> userOrderEntity;
 }

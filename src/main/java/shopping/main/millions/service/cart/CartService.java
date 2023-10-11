@@ -141,7 +141,7 @@ public class CartService {
                 Long productId =cartProductEntity.getProductEntity().getProductId();
                 Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productId);
                 List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
-                List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
+                List<GoodsImageDto> goodsImageDtos = new ArrayList<>();
 
                 for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
                     GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
@@ -149,7 +149,7 @@ public class CartService {
                             .productImageOriginName(goodsImageEntity.getProductImageOriginName())
                             .productImageSave(goodsImageEntity.getProductImageSave())
                             .build();
-                    goodsImageDtoList.add(goodsImageDto);
+                    goodsImageDtos.add(goodsImageDto);
                 }
 
                 CartProductDto dto = new CartProductDto().builder()
@@ -161,7 +161,7 @@ public class CartService {
                         .cartProductColor(cartProductEntity.getCartProductColor())
                         .productPrice(cartProductEntity.getProductEntity().getProductPrice())
                         .productName(cartProductEntity.getProductEntity().getProductName())
-                        .productImage(goodsImageDtoList)
+                        .goodsImageDtoList(goodsImageDtos)
                         .build();
                 cartProductDtoList.add(dto);
             }
@@ -193,7 +193,7 @@ public class CartService {
                 Long productId = cartProductEntity.getProductEntity().getProductId();
                 Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productId);
                 List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
-                List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
+                List<GoodsImageDto> goodsImageDtos = new ArrayList<>();
 
                 for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
                     GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
@@ -201,7 +201,7 @@ public class CartService {
                             .productImageOriginName(goodsImageEntity.getProductImageOriginName())
                             .productImageSave(goodsImageEntity.getProductImageSave())
                             .build();
-                    goodsImageDtoList.add(goodsImageDto);
+                    goodsImageDtos.add(goodsImageDto);
                 }
 
                 CartProductDto cartProductDto = new CartProductDto().builder()
@@ -213,7 +213,7 @@ public class CartService {
                         .cartProductColor(cartProductEntity.getCartProductColor())
                         .productPrice(cartProductEntity.getProductEntity().getProductPrice())
                         .productName(cartProductEntity.getProductEntity().getProductName())
-                        .productImage(goodsImageDtoList)
+                        .goodsImageDtoList(goodsImageDtos)
                         .build();
 
                 return ResponseEntity.ok(cartProductDto);
@@ -242,7 +242,7 @@ public class CartService {
                     Long productId = cartProductEntity.getProductEntity().getProductId();
                     Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productId);
                     List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
-                    List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
+                    List<GoodsImageDto> goodsImageDtos = new ArrayList<>();
 
                     for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
                         GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
@@ -250,7 +250,7 @@ public class CartService {
                                 .productImageOriginName(goodsImageEntity.getProductImageOriginName())
                                 .productImageSave(goodsImageEntity.getProductImageSave())
                                 .build();
-                        goodsImageDtoList.add(goodsImageDto);
+                        goodsImageDtos.add(goodsImageDto);
                     }
 
                     CartProductDto cartProductDto = new CartProductDto().builder()
@@ -262,7 +262,7 @@ public class CartService {
                             .cartProductColor(cartProductEntity.getCartProductColor())
                             .productPrice(cartProductEntity.getProductEntity().getProductPrice())
                             .productName(cartProductEntity.getProductEntity().getProductName())
-                            .productImage(goodsImageDtoList)
+                            .goodsImageDtoList(goodsImageDtos)
                             .build();
 
                     return ResponseEntity.ok(cartProductDto);

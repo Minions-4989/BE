@@ -18,8 +18,13 @@ import java.time.LocalDateTime;
 @SuperBuilder
 @NoArgsConstructor
 public class GoodsImageDto {
-    private String productImage;
-    private String productImageOriginName;
-    private String productImageSave;
-    private ProductEntity productEntity;
+    private Long imageId;
+
+    private Long productId;
+
+    private String productImage; // s3주소가 저장될 컬럼
+
+    private String productImageOriginName;  // 이미지 오리지널 네임이 저장될 컬럼 필요
+
+    private String productImageSave; // 이미지 s3에 저장될 네임이 저장될 컬럼 필요
 }

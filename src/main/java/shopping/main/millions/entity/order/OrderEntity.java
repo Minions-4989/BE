@@ -10,7 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
-@Table(name = "user_order")
+@Table(name = "order_product") // 아 근데 order 못써용 깜빡했넹ㅎㅎ why? mysql order라는게 예약어 일껄용?들어본거같아요
 public class OrderEntity {
 
     @Id

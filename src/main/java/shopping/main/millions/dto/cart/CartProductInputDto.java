@@ -1,6 +1,7 @@
 package shopping.main.millions.dto.cart;
 
 import lombok.*;
+import shopping.main.millions.entity.cart.CartEntity;
 import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 
@@ -14,4 +15,5 @@ public class CartProductInputDto {
     private String productColor;
     private Long productCount;
     private ProductEntity productEntity;
+    private CartEntity cartEntity;
 }

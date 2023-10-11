@@ -35,7 +35,6 @@ public class OrderController {
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
 //        orderService.saveInfo(orderDto);
-        // 일단 orderDto를 싹 들고 service로 가세여
         return null;
     }
 

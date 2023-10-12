@@ -1,16 +1,8 @@
 package shopping.main.millions.entity.product;
 
 
-
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.experimental.SuperBuilder;
 import lombok.*;
-
-import shopping.main.millions.entity.product.ProductEntity;
-import org.springframework.web.multipart.MultipartFile;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 
@@ -18,8 +10,10 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "stock")
-@Getter @Setter
+@Getter
+@Setter
 @SuperBuilder
+
 //재고 테이블
 public class GoodsStockEntity {
 
@@ -28,7 +22,7 @@ public class GoodsStockEntity {
     @Column(name = "stock_id")
     private Long stockId;       //stock
 
-    @Column(name = "stock_quantity", nullable = false , length = 10)
+    @Column(name = "stock_quantity", nullable = false, length = 10)
     private Long stockQuantity; //수량
 
     @Column(name = "stock_size", nullable = false, length = 10)
@@ -43,13 +37,6 @@ public class GoodsStockEntity {
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
 
-//    @Transient
-//    private MultipartFile stockFile;
-//
-//    @Builder
-//    public GoodsStockEntity(Long stockQuantity, String stockSize, String stockColor) {
-//        this.stockQuantity = stockQuantity;
-//        this.stockSize = stockSize;
-//        this.stockColor = stockColor;
-//    }
-}
+
+    }
+

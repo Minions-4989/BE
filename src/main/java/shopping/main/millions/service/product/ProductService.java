@@ -25,29 +25,38 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final GoodsImageRepository goodsImageRepository;
 
-    public Page<ProductDto> getProductsByPage(Pageable pageable) {
-        Page<ProductEntity> products = productRepository.findAll(pageable);
-        List<ProductEntity> productList = products.getContent();
-        //Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productId);
-        //List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
-        List<GoodsImageDto> goodsImageDtos = new ArrayList<>();
+    public List<ProductDto> getProductsByPage(Pageable pageable) {
+        Page<ProductEntity> productListPage = productRepository.findAll(pageable);
+        List<ProductEntity> productList = new ArrayList<>();
+        if(productListPage.hasContent()){
+            productList = productListPage.getContent();
+        }else{
+            return null;
+        }
+        List<ProductDto> productDtoList = new ArrayList<>();
+        for (ProductEntity productEntity : productList) {
+            Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productEntity.getProductId());
+            List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
+            List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
 
-//        for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
-//            GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
-//                    .productImage(goodsImageEntity.getProductImage())
-//                    .productImageOriginName(goodsImageEntity.getProductImageOriginName())
-//                    .productImageSave(goodsImageEntity.getProductImageSave())
-//                    .build();
-//            goodsImageDtos.add(goodsImageDto);
-//        }
+            for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
+            GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
+                    .productImage(goodsImageEntity.getProductImage())
+                    .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+                    .productImageSave(goodsImageEntity.getProductImageSave())
+                    .build();
+            goodsImageDtoList.add(goodsImageDto);
+            }
+            ProductDto productDto = ProductDto.builder()
+                    .productId(productEntity.getProductId())
+                    .productPrice(productEntity.getProductPrice())
+                    .productName(productEntity.getProductName())
+                    .goodsImageDtoList(goodsImageDtoList)
+                    .build();
 
-        Page<ProductDto> productDto = products.map(product -> ProductDto.builder()
-                .productId(product.getProductId())
-                .productName(product.getProductName())
-                .productPrice(product.getProductPrice())
-                .goodsImageDtoList(goodsImageDtos)
-                .build());
-        return productDto;
+            productDtoList.add(productDto);
+        }
+        return productDtoList;
     }
 
     public ResponseEntity<?> findProductById(Long id) {
@@ -72,22 +81,45 @@ public class ProductService {
         }
     }
 
-    public Page<ProductDto> getProductsByCategory(Pageable pageable, String categoryName) {
+    public List<ProductDto> getProductsByCategory(Pageable pageable, String categoryName) {
 
         Optional<CategoryEntity> categoryEntityOptional = categoryRepository.findByCategoryName(categoryName);
 
         if(categoryEntityOptional.isPresent()) {
             CategoryEntity categoryEntity = categoryEntityOptional.get();
 
-            Page<ProductEntity> products = productRepository.findAllByCategoryEntityOrderByProductId(categoryEntity, pageable);
+            Page<ProductEntity> productListPage = productRepository.findAllByCategoryEntity_CategoryName(categoryEntity.getCategoryName(), pageable);
 
-            Page<ProductDto> productDtoPage = products.map(product -> ProductDto.builder()
-                    .productId(product.getProductId())
-                    .productName(product.getProductName())
-                    .productPrice(product.getProductPrice())
-                    .build());
-            return productDtoPage;
-        }
+            List<ProductEntity> productList = new ArrayList<>();
+            if(productListPage.hasContent()){
+                productList = productListPage.getContent();
+            }else{
+                return null;
+            }
+            List<ProductDto> productDtoList = new ArrayList<>();
+            for (ProductEntity productEntity : productList) {
+                Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productEntity.getProductId());
+                List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
+                List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
+
+                for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
+                    GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
+                            .productImage(goodsImageEntity.getProductImage())
+                            .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+                            .productImageSave(goodsImageEntity.getProductImageSave())
+                            .build();
+                    goodsImageDtoList.add(goodsImageDto);
+                }
+                ProductDto productDto = ProductDto.builder()
+                        .productId(productEntity.getProductId())
+                        .productPrice(productEntity.getProductPrice())
+                        .productName(productEntity.getProductName())
+                        .goodsImageDtoList(goodsImageDtoList)
+                        .build();
+
+                productDtoList.add(productDto);
+            }
+            return productDtoList; }
         else{
             return null;
         }

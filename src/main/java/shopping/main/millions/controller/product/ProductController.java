@@ -34,9 +34,9 @@ public class ProductController {
 
     //상품 페이지 조회
     @GetMapping("/list")
-    public ResponseEntity<Page<ProductDto>> viewProductListByPage (@PageableDefault(page= 0, size = 10, sort = "productId", direction = Sort.Direction.ASC)
+    public ResponseEntity<List<ProductDto>> viewProductListByPage (@PageableDefault(page= 0, size = 10, sort = "productId", direction = Sort.Direction.ASC)
                                                                    Pageable pageable){
-        Page<ProductDto> products = productService.getProductsByPage(pageable);
+        List<ProductDto> products = productService.getProductsByPage(pageable);
         return ResponseEntity.ok(products);
     }
 
@@ -47,10 +47,10 @@ public class ProductController {
     }
 
     //카테고리별 조회
-    @GetMapping("/category")
-    public ResponseEntity<Page<ProductDto>> searchProductByCategory(@PageableDefault(page= 0, size = 10, sort = "productId", direction = Sort.Direction.ASC)
-                                                                  Pageable pageable, @RequestParam String categoryName) {
-        Page<ProductDto> products = productService.getProductsByCategory(pageable,categoryName);
+    @GetMapping("/category/{categoryName}")
+    public ResponseEntity<List<ProductDto>> searchProductByCategory(@PageableDefault(page= 0, size = 10, sort = "productId", direction = Sort.Direction.ASC)
+                                                                  Pageable pageable, @PathVariable("categoryName") String categoryName) {
+        List<ProductDto> products = productService.getProductsByCategory(pageable,categoryName);
         return ResponseEntity.ok(products);
     }
 

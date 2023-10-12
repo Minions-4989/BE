@@ -60,29 +60,11 @@ public class CartService {
 
         //카트 테이블에 데이터가 있는지 없는지 먼저 확인하고 있으면 카트아이디값을 가져오지만, 없으면 추가해줄것임
         Optional<CartEntity> cartEntityOptional = cartRepository.findCartEntityByMemberEntity_UserId(cartAddDto.getUserId());
-        Long cartId;
 
-        if(cartEntityOptional.isPresent()){
-            //이미 사용자의 장바구니가 생성되었다.
-            //카트 아이디 값 가져오기
-            CartEntity cartEntityExist = cartEntityOptional.get();
-            cartId = cartEntityExist.getCartId();
-        }else{
-            //장바구니에 아예 처음 담는 사람이다.
-            System.out.println(cartAddDto.getUserId());
-            Optional<MemberEntity> memberEntityOptional = memberRepository.findById(cartAddDto.getUserId());
-            MemberEntity memberEntity = memberEntityOptional.get();
+        //카트 아이디 값 가져오기
+        CartEntity cartEntityExist = cartEntityOptional.get();
+        Long cartId = cartEntityExist.getCartId();
 
-            CartEntity cartEntityNew = CartEntity.builder().memberEntity(memberEntity).build();
-            cartRepository.save(cartEntityNew);
-            //int result = cartRepository.insertNewCartId(memberEntity.getUserId());
-
-
-            Optional<CartEntity> cartEntityOptionalNewCart = cartRepository.findById(cartEntityNew.getCartId());
-            CartEntity cartEntityNewCart = cartEntityOptionalNewCart.get();
-            cartId = cartEntityNewCart.getCartId();
-        }
-        System.out.println(cartId);
         Optional<CartEntity> cartEntityOptional1 = cartRepository.findById(cartId);
         CartEntity cartEntity = cartEntityOptional1.get();
 

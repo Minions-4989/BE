@@ -69,13 +69,25 @@ public class ProductService {
 
         if(byId.isPresent()) {
             ProductEntity productEntity = byId.get();
+            Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productEntity.getProductId());
+            List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
+            List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
 
-            // entity -> dto
+            for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
+                GoodsImageDto goodsImageDto = GoodsImageDto.builder()
+                        .productImage(goodsImageEntity.getProductImage())
+                        .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+                        .productImageSave(goodsImageEntity.getProductImageSave())
+                        .build();
+                goodsImageDtoList.add(goodsImageDto);
+            }
+
             ProductDto productDTO = ProductDto
                     .builder()
                     .productId(productEntity.getProductId())
                     .productName(productEntity.getProductName())
                     .productPrice(productEntity.getProductPrice())
+                    .goodsImageDtoList(goodsImageDtoList)
                     .build();
 
             return ResponseEntity.status(200).body(productDTO);

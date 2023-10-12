@@ -280,41 +280,46 @@ public class GoodsSaveService {
 
     //판매자 상품 전체 조회
     public ResponseEntity<?> findGoods(String userId) {
+       return ResponseEntity.status(200).body(getProductListResDto(userId));
+    }
+
+    public List<ProductListResponseDto> getProductListResDto(String userId){
         List<ProductEntity> productEntityList = productRepository.findByMemberEntity_UserId(Long.valueOf(userId));
         List<ProductListResponseDto> productListResponseDtoList = new ArrayList<>();
-       for(ProductEntity productEntity : productEntityList){
-           List<StockSaveDto> stockSaveDtoList = new ArrayList<StockSaveDto>();
-           for(GoodsStockEntity goodsStockEntity : productEntity.getGoodsStockEntityList()){
-               StockSaveDto stockSaveDto = StockSaveDto.builder()
-                       .stockColor(goodsStockEntity.getStockColor())
-                       .stockSize(goodsStockEntity.getStockSize())
-                       .stockQuantity(goodsStockEntity.getStockQuantity())
-                       .build();
-               stockSaveDtoList.add(stockSaveDto);
-           }
-           List<GoodsImageDto> goodsImageDtoList = new ArrayList<GoodsImageDto>();
-           for(GoodsImageEntity goodsImageEntity: productEntity.getGoodsImageEntityList()) {
-               GoodsImageDto goodsImageDto = GoodsImageDto.builder()
-                       .imageId(goodsImageEntity.getImageId())
-                       .productId(goodsImageEntity.getProductEntity().getProductId())
-                       .productImageSave(goodsImageEntity.getProductImageSave())
-                       .productImageOriginName(goodsImageEntity.getProductImageOriginName())
-                       .productImage(goodsImageEntity.getProductImage())
-                       .build();
-               goodsImageDtoList.add(goodsImageDto);
-           }
+        for(ProductEntity productEntity : productEntityList){
+            List<StockSaveDto> stockSaveDtoList = new ArrayList<StockSaveDto>();
+            for(GoodsStockEntity goodsStockEntity : productEntity.getGoodsStockEntityList()){
+                StockSaveDto stockSaveDto = StockSaveDto.builder()
+                        .stockColor(goodsStockEntity.getStockColor())
+                        .stockSize(goodsStockEntity.getStockSize())
+                        .stockQuantity(goodsStockEntity.getStockQuantity())
+                        .build();
+                stockSaveDtoList.add(stockSaveDto);
+            }
+            List<GoodsImageDto> goodsImageDtoList = new ArrayList<GoodsImageDto>();
+            for(GoodsImageEntity goodsImageEntity: productEntity.getGoodsImageEntityList()) {
+                GoodsImageDto goodsImageDto = GoodsImageDto.builder()
+                        .imageId(goodsImageEntity.getImageId())
+                        .productId(goodsImageEntity.getProductEntity().getProductId())
+                        .productImageSave(goodsImageEntity.getProductImageSave())
+                        .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+                        .productImage(goodsImageEntity.getProductImage())
+                        .build();
+                goodsImageDtoList.add(goodsImageDto);
+            }
 
-           ProductListResponseDto productListResponseDto = ProductListResponseDto.builder()
-                   .productName(productEntity.getProductName())
-                   .categoryName(productEntity.getProductName())
-                   .productPrice(productEntity.getProductPrice())
-                   .stockOption(stockSaveDtoList)
-                   .imageFileList(goodsImageDtoList)
-                   .build();
-           productListResponseDtoList.add(productListResponseDto);
-       }
-       return ResponseEntity.status(200).body(productListResponseDtoList);
+            ProductListResponseDto productListResponseDto = ProductListResponseDto.builder()
+                    .productName(productEntity.getProductName())
+                    .categoryName(productEntity.getProductName())
+                    .productPrice(productEntity.getProductPrice())
+                    .stockOption(stockSaveDtoList)
+                    .imageFileList(goodsImageDtoList)
+                    .build();
+            productListResponseDtoList.add(productListResponseDto);
+        }
+        return productListResponseDtoList;
     }
+
 }
 
 

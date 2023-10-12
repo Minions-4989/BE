@@ -10,11 +10,12 @@ import javax.persistence.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 @Builder
-@Table(name = "user_order")
+@Table(name = "order_product") // 아 근데 order 못써용 깜빡했넹ㅎㅎ why? mysql order라는게 예약어 일껄용?들어본거같아요
 public class OrderEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "order_id")
+    @Column(name = "orders_id")
     private Long orderId; //구매상품 번호
 
     @Column(name = "product_name")
@@ -30,7 +31,7 @@ public class OrderEntity {
     private String cartProductColor; // 상품 색상
 
     @Column(name = "product_price")
-    private Long productPrice; // 상품 가격
+    private Integer productPrice; // 상품 가격
 
     @ManyToOne
     @JoinColumn(name = "product_id")

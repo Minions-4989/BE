@@ -8,7 +8,6 @@ import javax.persistence.*;
 import java.util.List;
 
 @Getter
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -21,8 +20,8 @@ public class UserOrderEntity {
     @Column(name = "user_order_id")
     private Long userOrderId;
 
-    @Column(name = "tel_number")
-    private String telNumber;
+    @Column(name = "tell_number")
+    private String tellNumber;
 
     @Column(name = "user_name")
     private String userName;
@@ -35,6 +34,9 @@ public class UserOrderEntity {
 
     @Column(name = "address_detail")
     private String addressDetail;
+
+    @Column(name = "user_email")
+    private String userEmail;
 
     @ManyToOne
     @JoinColumn(name = "cart_id")

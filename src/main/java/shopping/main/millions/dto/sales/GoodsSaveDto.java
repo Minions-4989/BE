@@ -9,28 +9,27 @@ import shopping.main.millions.entity.category.CategoryEntity;
 import shopping.main.millions.entity.product.GoodsStockEntity;
 
 import java.time.LocalDateTime;
+import java.util.Date;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class GoodsSaveDto {
 //근데 이건 물품등록인가용?
-
-    private Long productId; // 품목 Id
+    private String productId; // 상품 id
 
     private String productName; // 품목 이름
 
-    private CategoryEntity categoryName; // 품목 종류
+    private String categoryName; // 품목 종류
 
     private Integer productPrice; // 품목 가격
 
-    private DateTime productDate;// 품목 등록 날짜
-
     private List<StockSaveDto> stockOption;
 
-    private List<MultipartFile> imageFile;
+
 
 
 

@@ -59,9 +59,4 @@ public class CartController {
         String userId = tokenProvider.getUserPk(header);
         return cartService.deleteProductList(cartProductIdList, userId);
     }
-
-    //장바구니 주문
-//    @PostMapping("/order")
-//    public ResponseEntity<>
-
 }

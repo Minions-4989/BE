@@ -6,11 +6,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shopping.main.millions.dto.product.ProductDto;
+import shopping.main.millions.dto.sales.GoodsImageDto;
 import shopping.main.millions.entity.category.CategoryEntity;
+import shopping.main.millions.entity.product.GoodsImageEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.repository.product.CategoryRepository;
 import shopping.main.millions.repository.product.ProductRepository;
+import shopping.main.millions.repository.sales.GoodsImageRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,16 +23,40 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final GoodsImageRepository goodsImageRepository;
 
-    public Page<ProductDto> getProductsByPage(Pageable pageable) {
-        Page<ProductEntity> products = productRepository.findAll(pageable);
-        Page<ProductDto> productDto = products.map(product -> ProductDto.builder()
-                .productId(product.getProductId())
-                .productName(product.getProductName())
-                .productPrice(product.getProductPrice())
-                .productDate(product.getProductDate())
-                .build());
-        return productDto;
+    public List<ProductDto> getProductsByPage(Pageable pageable) {
+        Page<ProductEntity> productListPage = productRepository.findAll(pageable);
+        List<ProductEntity> productList = new ArrayList<>();
+        if(productListPage.hasContent()){
+            productList = productListPage.getContent();
+        }else{
+            return null;
+        }
+        List<ProductDto> productDtoList = new ArrayList<>();
+        for (ProductEntity productEntity : productList) {
+            Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productEntity.getProductId());
+            List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
+            List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
+
+            for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
+            GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
+                    .productImage(goodsImageEntity.getProductImage())
+                    .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+                    .productImageSave(goodsImageEntity.getProductImageSave())
+                    .build();
+            goodsImageDtoList.add(goodsImageDto);
+            }
+            ProductDto productDto = ProductDto.builder()
+                    .productId(productEntity.getProductId())
+                    .productPrice(productEntity.getProductPrice())
+                    .productName(productEntity.getProductName())
+                    .goodsImageDtoList(goodsImageDtoList)
+                    .build();
+
+            productDtoList.add(productDto);
+        }
+        return productDtoList;
     }
 
     public ResponseEntity<?> findProductById(Long id) {
@@ -43,7 +72,6 @@ public class ProductService {
                     .productId(productEntity.getProductId())
                     .productName(productEntity.getProductName())
                     .productPrice(productEntity.getProductPrice())
-                    .productDate(productEntity.getProductDate())
                     .build();
 
             return ResponseEntity.status(200).body(productDTO);
@@ -53,23 +81,45 @@ public class ProductService {
         }
     }
 
-    public Page<ProductDto> getProductsByCategory(Pageable pageable, String categoryName) {
+    public List<ProductDto> getProductsByCategory(Pageable pageable, String categoryName) {
 
         Optional<CategoryEntity> categoryEntityOptional = categoryRepository.findByCategoryName(categoryName);
 
         if(categoryEntityOptional.isPresent()) {
             CategoryEntity categoryEntity = categoryEntityOptional.get();
 
-            Page<ProductEntity> products = productRepository.findAllByCategoryEntityOrderByProductId(categoryEntity, pageable);
+            Page<ProductEntity> productListPage = productRepository.findAllByCategoryEntity_CategoryName(categoryEntity.getCategoryName(), pageable);
 
-            Page<ProductDto> productDtoPage = products.map(product -> ProductDto.builder()
-                    .productId(product.getProductId())
-                    .productName(product.getProductName())
-                    .productPrice(product.getProductPrice())
-                    .productDate(product.getProductDate())
-                    .build());
-            return productDtoPage;
-        }
+            List<ProductEntity> productList = new ArrayList<>();
+            if(productListPage.hasContent()){
+                productList = productListPage.getContent();
+            }else{
+                return null;
+            }
+            List<ProductDto> productDtoList = new ArrayList<>();
+            for (ProductEntity productEntity : productList) {
+                Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productEntity.getProductId());
+                List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
+                List<GoodsImageDto> goodsImageDtoList = new ArrayList<>();
+
+                for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
+                    GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
+                            .productImage(goodsImageEntity.getProductImage())
+                            .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+                            .productImageSave(goodsImageEntity.getProductImageSave())
+                            .build();
+                    goodsImageDtoList.add(goodsImageDto);
+                }
+                ProductDto productDto = ProductDto.builder()
+                        .productId(productEntity.getProductId())
+                        .productPrice(productEntity.getProductPrice())
+                        .productName(productEntity.getProductName())
+                        .goodsImageDtoList(goodsImageDtoList)
+                        .build();
+
+                productDtoList.add(productDto);
+            }
+            return productDtoList; }
         else{
             return null;
         }

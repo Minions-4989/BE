@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import shopping.main.millions.dto.member.sighUp.SighUpDto;
+import shopping.main.millions.entity.cart.CartEntity;
 import shopping.main.millions.entity.member.AddressEntity;
 import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.jwt.TokenProvider;
@@ -13,6 +14,7 @@ import shopping.main.millions.jwt.dto.LoginTokenSaveDto;
 import shopping.main.millions.jwt.dto.Token;
 import shopping.main.millions.jwt.entity.RefreshToken;
 import shopping.main.millions.jwt.repository.JwtRepository;
+import shopping.main.millions.repository.cart.CartRepository;
 import shopping.main.millions.repository.member.AddressRepository;
 import shopping.main.millions.repository.member.MemberRepository;
 
@@ -28,6 +30,7 @@ public class MemberService {
     private final MemberImageSaveService memberImageSaveService;
     private final TokenProvider tokenProvider;
     private final JwtRepository jwtRepository;
+    private final CartRepository cartRepository;
 
     public ResponseEntity<?> memberSignUp(SighUpDto sighUp) {
         String emailPattern = "^[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*@[0-9a-zA-Z]([-_.]?[0-9a-zA-Z])*.[a-zA-Z]{2,3}$";
@@ -55,9 +58,15 @@ public class MemberService {
                                     .address(sighUp.getAddress())
                                     .addressDetail(sighUp.getAddressDetail())
                                     .build();
-                            memberEntity.setAddressEntity(addressEntity);
-                            Long userId = memberRepository.save(memberEntity).getUserId();
-                            if (userId > 0) {
+                            AddressEntity savedAddress = addressRepository.save(addressEntity);
+
+                            memberEntity.setAddressEntity(savedAddress);
+
+                            MemberEntity member = memberRepository.save(memberEntity);
+                            CartEntity cartEntity = new CartEntity();
+                            cartEntity.setMemberEntity(member);
+                            cartRepository.save(cartEntity);
+                            if (member.getUserId() > 0) {
                                 response.put("success", true);
                                 response.put("message", "회원가입이 성공적으로 완료되었습니다.");
                                 return ResponseEntity.status(200).body(response);
@@ -89,8 +98,11 @@ public class MemberService {
                                     .status(true)
                                     .build();
 
-                            Long userId = memberRepository.save(memberEntity).getUserId();
-                            if (userId > 0) {
+                            MemberEntity member = memberRepository.save(memberEntity);
+                            CartEntity cartEntity = new CartEntity();
+                            cartEntity.setMemberEntity(member);
+                            cartRepository.save(cartEntity);
+                            if (member.getUserId() > 0) {
                                 response.put("success", true);
                                 response.put("message", "회원가입이 성공적으로 완료되었습니다.");
                                 return ResponseEntity.status(200).body(response);

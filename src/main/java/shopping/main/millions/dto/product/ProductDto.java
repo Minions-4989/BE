@@ -2,8 +2,10 @@ package shopping.main.millions.dto.product;
 
 import lombok.*;
 import org.joda.time.DateTime;
+import shopping.main.millions.dto.sales.GoodsImageDto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -17,6 +19,6 @@ public class ProductDto {
 
     private Integer productPrice;
 
-    private DateTime productDate;
+    private List<GoodsImageDto> goodsImageDtoList;
 
 }

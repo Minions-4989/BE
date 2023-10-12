@@ -3,7 +3,7 @@ package shopping.main.millions.entity.order;
 import lombok.*;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
 @AllArgsConstructor
@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class OrderPaymentEntity {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "order_payment_id")
     private Long orderPaymentId; // 주문 번호
 
@@ -27,11 +27,11 @@ public class OrderPaymentEntity {
     @Column(name = "card_expiration_period")
     private String cardExpirationPeriod; //카드 유효기간
 
-    @Column(name = "delivery_price")
-    private String deliveryPrice; // 결제 총 금액
+    @Column(name = "total_price")
+    private Integer totalPrice; // 결제 총 금액
 
-    @Column(name = "delivery_date")
-    private LocalDateTime deliveryDate; // 구매 날짜
+    @Column(name = "order_date")
+    private Date orderDate; // 구매 날짜
 
     @ManyToOne
     @JoinColumn(name = "user_order_id")

@@ -14,7 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class CartProductDto {
 
-    private Long userId;
     private Long productId;
     private Long cartProductId;
     private Long cartProductCount;
@@ -22,6 +21,6 @@ public class CartProductDto {
     private String cartProductColor;
     private Integer productPrice;
     private String productName;
-    private List<GoodsImageEntity> productImage;
+    private List<GoodsImageDto> goodsImageDtoList;
 
 }

@@ -128,10 +128,10 @@ public class OrderService {
                     return ResponseEntity.badRequest().body("존재하지 않는 상품입니다.");
                 }
 
-            // CartProduct에서 삭제
-            cartProductRepository.deleteById(cartProductDto.getCartProductId());
+                // CartProduct에서 삭제
+                cartProductRepository.deleteById(cartProductDto.getCartProductId());
+            }
         }
-
         return ResponseEntity.ok("주문에 성공하였습니다.");
     }
 }

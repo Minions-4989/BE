@@ -164,7 +164,6 @@ public class CartService {
                 }
 
                 CartProductDto dto = new CartProductDto().builder()
-                        .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
                         .productId(cartProductEntity.getProductEntity().getProductId())
                         .cartProductId(cartProductEntity.getCartProductId())
                         .cartProductCount(cartProductEntity.getCartProductCount())
@@ -217,7 +216,6 @@ public class CartService {
 
                 CartProductDto cartProductDto = new CartProductDto().builder()
                         .cartProductCount(cartProductEntity.getCartProductCount())
-                        .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
                         .productId(cartProductEntity.getCartProductId())
                         .cartProductId(cartProductEntity.getCartProductId())
                         .cartProductSize(cartProductEntity.getCartProductSize())
@@ -266,7 +264,6 @@ public class CartService {
 
                     CartProductDto cartProductDto = new CartProductDto().builder()
                             .cartProductCount(cartProductEntity.getCartProductCount())
-                            .userId(cartProductEntity.getProductEntity().getMemberEntity().getUserId())
                             .productId(cartProductEntity.getCartProductId())
                             .cartProductId(cartProductEntity.getCartProductId())
                             .cartProductSize(cartProductEntity.getCartProductSize())

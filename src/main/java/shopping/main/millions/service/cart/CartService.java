@@ -116,9 +116,14 @@ public class CartService {
     }
 
         public ResponseEntity<?> cartProductList (String userId){
+            List<CartProductDto> cartProductDtoList =  GetcartProductDtoList(userId);
+            return ResponseEntity.status(200).body(cartProductDtoList);
+        }
+
+        public List<CartProductDto> GetcartProductDtoList(String userId){
             // userId를 통해 해당 CartEntity 찾기
             Optional<CartEntity> cartEntityById = cartRepository.findCartEntityByMemberEntity_UserId(Long.valueOf(userId));
-            if(!cartEntityById.isPresent())return ResponseEntity.status(400).body(null);
+            if(cartEntityById.isEmpty()) return null;
             CartEntity cartEntity = cartEntityById.get();
 
             Long cartId = cartEntity.getCartId();
@@ -157,8 +162,9 @@ public class CartService {
                         .build();
                 cartProductDtoList.add(dto);
             }
-            return ResponseEntity.status(200).body(cartProductDtoList);
+            return cartProductDtoList;
         }
+
 
     // 수량 수정(증가)
     public ResponseEntity<?> increaseQuantity (Long cartProductId) {

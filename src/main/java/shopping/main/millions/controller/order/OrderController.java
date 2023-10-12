@@ -45,7 +45,6 @@ public class OrderController {
     public ResponseEntity<?> orderItems(@RequestBody OrderDto orderDto, HttpServletRequest request) {
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
-        orderService.orderProcess(orderDto);
-        return null;
+        return  orderService.orderProcess(orderDto);
     }
 }

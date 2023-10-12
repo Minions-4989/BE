@@ -39,7 +39,7 @@ public class OrderService {
         // Entity 변환 후 저장
         MemberEntity memberEntity = memberRepository.findById(Long.valueOf(userId)).get();
         UserOrderEntity userOrderEntity = UserOrderEntity.builder()
-                .tellNumber(orderDto.getTelNumber())
+                .tellNumber(orderDto.getTellNumber())
                 .userName(orderDto.getUserName())
                 .address(orderDto.getAddress())
                 .addressDetail(orderDto.getAddressDetail())
@@ -73,6 +73,9 @@ public class OrderService {
         // PutMapping - dto 받아서 거기에 있는 상품 리스트 통해,
         // 구매상품 OrderEntity에 저장, Stock 변경, CartProduct 삭제
 
+        // order_product 여러개 생성(ex. cartProductCount가 3이면 3개 생성됨, product_id null값 반환 -> 고쳐야됨
+        // 결제 전 재고수량 > cartProductCount 충족할 때만 결제 가능하게 if문 구현
+
         // 체크된 상품 리스트화
         List<CartProductDto> cartProductDtoList = orderDto.getCartProductDtoList();
 
@@ -98,7 +101,11 @@ public class OrderService {
                 GoodsStockEntity goodsStockEntity = goodsStockEntityById.get();
 
                 GoodsStockEntity goodsStockEntityChanged = GoodsStockEntity.builder()
+                        .stockId(goodsStockEntity.getStockId())
                         .stockQuantity(goodsStockEntity.getStockQuantity() - cartProductDto.getCartProductCount())
+                        .stockSize(goodsStockEntity.getStockSize())
+                        .stockColor(goodsStockEntity.getStockColor())
+                        .productEntity(goodsStockEntity.getProductEntity())
                         .build();
                 goodsStockRepository.save(goodsStockEntityChanged);
             } else {

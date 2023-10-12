@@ -13,14 +13,19 @@ import shopping.main.millions.entity.order.OrderEntity;
 import shopping.main.millions.entity.order.OrderPaymentEntity;
 import shopping.main.millions.entity.order.UserOrderEntity;
 import shopping.main.millions.entity.product.GoodsStockEntity;
+import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.repository.cart.CartProductRepository;
+import shopping.main.millions.repository.cart.CartRepository;
 import shopping.main.millions.repository.member.MemberRepository;
 import shopping.main.millions.repository.order.OrderPaymentRepository;
 import shopping.main.millions.repository.order.OrderRepository;
 import shopping.main.millions.repository.order.UserOrderRepository;
+import shopping.main.millions.repository.product.ProductRepository;
 import shopping.main.millions.repository.sales.GoodsStockRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Log4j2
@@ -34,6 +39,7 @@ public class OrderService {
     private final GoodsStockRepository goodsStockRepository;
     private final CartProductRepository cartProductRepository;
     private final MemberRepository memberRepository;
+    private final ProductRepository productRepository;
 
     public UserOrderEntity saveUser(OrderDto orderDto , String userId) {
         // Entity 변환 후 저장
@@ -54,6 +60,8 @@ public class OrderService {
 
     public ResponseEntity<?> saveUserPayment(OrderDto orderDto,  UserOrderEntity userOrder){
         // Entity 변환 후 저장
+        Map<String,Long> map = new HashMap<>();
+
         OrderPaymentEntity orderPaymentEntity = OrderPaymentEntity.builder()
                 .cardNum(orderDto.getCardNum())
                 .cardCvc(orderDto.getCardCvc())
@@ -63,13 +71,17 @@ public class OrderService {
                 .userOrderEntity(userOrder)
                 .build();
         orderPaymentRepository.save(orderPaymentEntity);
-
-        return ResponseEntity.ok("저장 완료");
+        map.put("userOrderId", userOrder.getUserOrderId());
+        return ResponseEntity.ok(map);
     }
 
-    public ResponseEntity<?> orderProcess(OrderDto orderDto) {
+    public ResponseEntity<?> orderProcess(OrderDto orderDto, String userId) {
         // PutMapping - dto 받아서 거기에 있는 상품 리스트 통해,
         // 구매상품 OrderEntity에 저장, Stock 변경, CartProduct 삭제
+
+        //카트아이디로 유저오더를 검색
+        Optional<UserOrderEntity> userOrderEntityOptional = userOrderRepository.findById(orderDto.getUserOrderId());
+        UserOrderEntity userOrderEntity = userOrderEntityOptional.get();
 
             // 체크된 상품 리스트화
             List<CartProductDto> cartProductDtoList = orderDto.getCartProductDtoList();
@@ -90,7 +102,8 @@ public class OrderService {
                     if (goodsStockEntity.getStockQuantity() < cartProductEntity.getCartProductCount()) {
                         return ResponseEntity.badRequest().body("재고가 부족합니다");
                     }
-
+                Optional<ProductEntity> productEntityOptional = productRepository.findById(cartProductDto.getProductId());
+                    ProductEntity productEntity = productEntityOptional.get();
                 // OrderEntity에 저장
                 OrderEntity orderEntity = OrderEntity.builder()
                         .cartProductColor(cartProductDto.getCartProductColor())
@@ -98,6 +111,8 @@ public class OrderService {
                         .cartProductSize(cartProductDto.getCartProductSize())
                         .productPrice(cartProductDto.getProductPrice())
                         .productName(cartProductDto.getProductName())
+                        .userOrderEntity(userOrderEntity)
+                        .productEntity(productEntity)
                         .build();
                 orderRepository.save(orderEntity);
 

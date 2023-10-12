@@ -36,4 +36,9 @@ public class OrderEntity {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private ProductEntity productEntity;
+
+    @ManyToOne
+    @JoinColumn(name = "user_order_id")
+    private UserOrderEntity userOrderEntity;
+
 }

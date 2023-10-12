@@ -47,8 +47,6 @@ public class OrderService {
                 .userEmail(orderDto.getUserEmail())
                 .cartEntity(memberEntity.getCartEntity())
                 .build();
-        // 한 손 머리위로 들고 내리치면서 보는중 됬죵? 다 그런건죵^^ 이런식으로 나머지도 하셔요^^ 안해줄거예영 ㅋㄷ
-        //이건 멀 저장하는건가영? 근데 카트id의 정보는 어디서 받아서 저장하는건가요? 카트의 정보를 어디서도 받지를않는데영???? 아니죠 카트의 정보는 어디있어요? 럼그글
         UserOrderEntity userOrder = userOrderRepository.save(userOrderEntity);
 
         return userOrder;
@@ -69,31 +67,29 @@ public class OrderService {
         return ResponseEntity.ok("저장 완료");
     }
 
-    public ResponseEntity<?> orderProcess(OrderDto orderDto, Long cartProductId) {
+    public ResponseEntity<?> orderProcess(OrderDto orderDto) {
         // PutMapping - dto 받아서 거기에 있는 상품 리스트 통해,
         // 구매상품 OrderEntity에 저장, Stock 변경, CartProduct 삭제
-
-        // order_product 여러개 생성(ex. cartProductCount가 3이면 3개 생성됨, product_id null값 반환 -> 고쳐야됨
-        // 결제 전 재고수량 > cartProductCount 충족할 때만 결제 가능하게 if문 구현
-        Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductId);
-        if (cartProductById.isPresent()) {
-            CartProductEntity cartProductEntity = cartProductById.get();
-            Optional<GoodsStockEntity> goodsStockById =
-                    goodsStockRepository.findByStockSizeAndStockColorAndProductEntity_ProductId(
-                            cartProductEntity.getCartProductSize(),
-                            cartProductEntity.getCartProductColor(),
-                            cartProductEntity.getProductEntity().getProductId()
-                    );
-            GoodsStockEntity goodsStockEntity = goodsStockById.get();
-
-            if (goodsStockEntity.getStockQuantity() < cartProductEntity.getCartProductCount()) {
-                return ResponseEntity.badRequest().body("재고가 부족합니다");
-            }
 
             // 체크된 상품 리스트화
             List<CartProductDto> cartProductDtoList = orderDto.getCartProductDtoList();
 
             for (CartProductDto cartProductDto : cartProductDtoList) {
+                // (재고 수량 < 구매할 수량) 이면, 재고 부족 알림
+                Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductDto.getCartProductId());
+                if (cartProductById.isPresent()) {
+                    CartProductEntity cartProductEntity = cartProductById.get();
+                    Optional<GoodsStockEntity> goodsStockById =
+                            goodsStockRepository.findByStockSizeAndStockColorAndProductEntity_ProductId(
+                                    cartProductEntity.getCartProductSize(),
+                                    cartProductEntity.getCartProductColor(),
+                                    cartProductEntity.getProductEntity().getProductId()
+                            );
+                    GoodsStockEntity goodsStockEntity = goodsStockById.get();
+
+                    if (goodsStockEntity.getStockQuantity() < cartProductEntity.getCartProductCount()) {
+                        return ResponseEntity.badRequest().body("재고가 부족합니다");
+                    }
 
                 // OrderEntity에 저장
                 OrderEntity orderEntity = OrderEntity.builder()

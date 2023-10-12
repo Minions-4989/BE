@@ -2,6 +2,7 @@ package shopping.main.millions.service.member;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -12,14 +13,17 @@ import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.jwt.TokenProvider;
 import shopping.main.millions.jwt.dto.LoginTokenSaveDto;
 import shopping.main.millions.jwt.dto.Token;
+import shopping.main.millions.jwt.dto.TokenRequestDto;
 import shopping.main.millions.jwt.entity.RefreshToken;
 import shopping.main.millions.jwt.repository.JwtRepository;
 import shopping.main.millions.repository.cart.CartRepository;
 import shopping.main.millions.repository.member.AddressRepository;
 import shopping.main.millions.repository.member.MemberRepository;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 @Service
@@ -156,12 +160,31 @@ public class MemberService {
                         .email(memberEntity.getUserEmail())
                         .build();
                 Token token = tokenProvider.createToken(loginTokenSaveDto.getId(), loginTokenSaveDto);
-                RefreshToken refreshToken = RefreshToken.builder()
-                        .token(token.getRefreshToken())
-                        .memberEntity(memberEntity)
+                Optional<RefreshToken> tokenOptional = jwtRepository.findByMemberEntity_UserId(memberEntity.getUserId());
+                if(tokenOptional.isEmpty()) {
+                    RefreshToken refreshToken = RefreshToken.builder()
+                            .token(token.getRefreshToken())
+                            .memberEntity(memberEntity)
+                            .build();
+                    jwtRepository.save(refreshToken);
+                }
+
+                TokenRequestDto tokenRequestDto = TokenRequestDto.builder()
+                        .accessToken(token.getAccessToken())
+                        .accessTokenExpireDate(token.getAccessTokenExpireDate())
+                        .issuedAt(token.getIssuedAt())
                         .build();
-                jwtRepository.save(refreshToken);
-                return ResponseEntity.status(200).headers(headers).body(token);
+
+                ResponseCookie cookie = ResponseCookie.from("refreshToken" , token.getRefreshToken())
+                        .maxAge(7 * 24 * 60 * 60)
+                        .path("/")
+                        .secure(true)
+                        .sameSite("None")
+                        .httpOnly(true)
+                        .build();
+                headers.add("Set-Cookie" , cookie.toString());
+
+                return ResponseEntity.status(200).headers(headers).body(tokenRequestDto);
             }else{
                 result.put("message" , "이메일 또는 비밀번호가 일치하지 않아요!");
                 return ResponseEntity.status(401).body(result);
@@ -176,5 +199,13 @@ public class MemberService {
         BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
         String entityPassword = memberRepository.findByUserEmail(email).getUserPassword();
         return bCryptPasswordEncoder.matches(password,entityPassword);
+    }
+
+    public ResponseEntity<?> logOut(String userId) {
+        Optional<RefreshToken> tokenOptional = jwtRepository.findByMemberEntity_UserId(Long.valueOf(userId));
+        if (tokenOptional.isPresent()){
+            jwtRepository.deleteById(tokenOptional.get().getId());
+        }
+        return ResponseEntity.status(200).build();
     }
 }

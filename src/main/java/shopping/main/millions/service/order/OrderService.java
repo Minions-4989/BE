@@ -69,48 +69,64 @@ public class OrderService {
         return ResponseEntity.ok("저장 완료");
     }
 
-    public ResponseEntity<?> orderProcess(OrderDto orderDto) {
+    public ResponseEntity<?> orderProcess(OrderDto orderDto, Long cartProductId) {
         // PutMapping - dto 받아서 거기에 있는 상품 리스트 통해,
         // 구매상품 OrderEntity에 저장, Stock 변경, CartProduct 삭제
 
         // order_product 여러개 생성(ex. cartProductCount가 3이면 3개 생성됨, product_id null값 반환 -> 고쳐야됨
         // 결제 전 재고수량 > cartProductCount 충족할 때만 결제 가능하게 if문 구현
+        Optional<CartProductEntity> cartProductById = cartProductRepository.findById(cartProductId);
+        if (cartProductById.isPresent()) {
+            CartProductEntity cartProductEntity = cartProductById.get();
+            Optional<GoodsStockEntity> goodsStockById =
+                    goodsStockRepository.findByStockSizeAndStockColorAndProductEntity_ProductId(
+                            cartProductEntity.getCartProductSize(),
+                            cartProductEntity.getCartProductColor(),
+                            cartProductEntity.getProductEntity().getProductId()
+                    );
+            GoodsStockEntity goodsStockEntity = goodsStockById.get();
 
-        // 체크된 상품 리스트화
-        List<CartProductDto> cartProductDtoList = orderDto.getCartProductDtoList();
-
-        for (CartProductDto cartProductDto : cartProductDtoList) {
-
-            // OrderEntity에 저장
-            OrderEntity orderEntity = OrderEntity.builder()
-                    .cartProductColor(cartProductDto.getCartProductColor())
-                    .cartProductCount(cartProductDto.getCartProductCount())
-                    .cartProductSize(cartProductDto.getCartProductSize())
-                    .productPrice(cartProductDto.getProductPrice())
-                    .productName(cartProductDto.getProductName())
-                    .build();
-            orderRepository.save(orderEntity);
-
-            // Stock 변경
-            Optional<GoodsStockEntity> goodsStockEntityById = goodsStockRepository.findByStockSizeAndStockColorAndProductEntity_ProductId(
-                    cartProductDto.getCartProductSize(),
-                    cartProductDto.getCartProductColor(),
-                    cartProductDto.getProductId()
-            );
-            if (goodsStockEntityById.isPresent()) {
-                GoodsStockEntity goodsStockEntity = goodsStockEntityById.get();
-
-                GoodsStockEntity goodsStockEntityChanged = GoodsStockEntity.builder()
-                        .stockId(goodsStockEntity.getStockId())
-                        .stockQuantity(goodsStockEntity.getStockQuantity() - cartProductDto.getCartProductCount())
-                        .stockSize(goodsStockEntity.getStockSize())
-                        .stockColor(goodsStockEntity.getStockColor())
-                        .productEntity(goodsStockEntity.getProductEntity())
-                        .build();
-                goodsStockRepository.save(goodsStockEntityChanged);
-            } else {
-                return ResponseEntity.badRequest().body("존재하지 않는 상품입니다.");
+            if (goodsStockEntity.getStockQuantity() < cartProductEntity.getCartProductCount()) {
+                return ResponseEntity.badRequest().body("재고가 부족합니다");
             }
+
+            // 체크된 상품 리스트화
+            List<CartProductDto> cartProductDtoList = orderDto.getCartProductDtoList();
+
+            for (CartProductDto cartProductDto : cartProductDtoList) {
+
+                // OrderEntity에 저장
+                OrderEntity orderEntity = OrderEntity.builder()
+                        .cartProductColor(cartProductDto.getCartProductColor())
+                        .cartProductCount(cartProductDto.getCartProductCount())
+                        .cartProductSize(cartProductDto.getCartProductSize())
+                        .productPrice(cartProductDto.getProductPrice())
+                        .productName(cartProductDto.getProductName())
+                        .build();
+                orderRepository.save(orderEntity);
+
+                // Stock 변경
+                Optional<GoodsStockEntity> goodsStockEntityById = goodsStockRepository.findByStockSizeAndStockColorAndProductEntity_ProductId(
+                        cartProductDto.getCartProductSize(),
+                        cartProductDto.getCartProductColor(),
+                        cartProductDto.getProductId()
+                );
+
+                if (goodsStockEntityById.isPresent()) {
+                    GoodsStockEntity goodsStockEntity2 = goodsStockEntityById.get();
+
+                    GoodsStockEntity goodsStockEntityChanged = GoodsStockEntity.builder()
+                            .stockId(goodsStockEntity2.getStockId())
+                            .stockQuantity(goodsStockEntity2.getStockQuantity() - cartProductDto.getCartProductCount())
+                            .stockSize(goodsStockEntity2.getStockSize())
+                            .stockColor(goodsStockEntity2.getStockColor())
+                            .productEntity(goodsStockEntity2.getProductEntity())
+                            .build();
+                    goodsStockRepository.save(goodsStockEntityChanged);
+
+                } else {
+                    return ResponseEntity.badRequest().body("존재하지 않는 상품입니다.");
+                }
 
             // CartProduct에서 삭제
             cartProductRepository.deleteById(cartProductDto.getCartProductId());

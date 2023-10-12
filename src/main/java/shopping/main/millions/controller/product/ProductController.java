@@ -68,12 +68,11 @@ public class ProductController {
     //상품 수정
     @PutMapping("/{product_id}")
     public ResponseEntity<Map<String, String>> goodsUpdate(@PathVariable("product_id") Long productId,
-                                                           @RequestPart GoodsModifyDto modifyDto,
-                                                           @RequestPart StockSaveDto stockSaveDto,
+                                                           @RequestPart GoodsModifyDto modifyDto,@RequestPart("imageFile") List<MultipartFile> imageFile,
                                                            HttpServletRequest request) {
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
-       return goodsSaveService.modifyItem(modifyDto, productId, userId, stockSaveDto);
+       return goodsSaveService.modifyItem(modifyDto, productId, userId , imageFile);
 
     }
 

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import shopping.main.millions.dto.cart.CartProductDto;
 import shopping.main.millions.dto.mypage.MyOrderDto;
 import shopping.main.millions.dto.mypage.MyOrderProductDto;
@@ -15,11 +16,16 @@ import shopping.main.millions.entity.member.MemberEntity;
 import shopping.main.millions.entity.order.OrderEntity;
 import shopping.main.millions.entity.order.OrderPaymentEntity;
 import shopping.main.millions.entity.order.UserOrderEntity;
+import shopping.main.millions.entity.product.GoodsStockEntity;
+import shopping.main.millions.entity.product.ProductEntity;
+import shopping.main.millions.jwt.repository.JwtRepository;
 import shopping.main.millions.repository.cart.CartRepository;
 import shopping.main.millions.repository.member.MemberRepository;
 import shopping.main.millions.repository.order.OrderPaymentRepository;
 import shopping.main.millions.repository.order.OrderRepository;
 import shopping.main.millions.repository.order.UserOrderRepository;
+import shopping.main.millions.repository.product.ProductRepository;
+import shopping.main.millions.repository.sales.GoodsStockRepository;
 import shopping.main.millions.service.cart.CartService;
 import shopping.main.millions.service.member.MemberService;
 import shopping.main.millions.service.sales.GoodsSaveService;
@@ -41,6 +47,10 @@ public class MypageService {
     private final OrderPaymentRepository orderPaymentRepository;
     private final OrderRepository orderRepository;
     private final MemberService memberService;
+    private final JwtRepository jwtRepository;
+    private final ProductRepository productRepository;
+    private final GoodsStockRepository goodsStockRepository;
+
 
     public ResponseEntity<?> mypagemain(String userId) {
         //멤버테이블, 장바구니 리스트, 구매 리스트, 등록 리스트
@@ -113,7 +123,21 @@ public class MypageService {
         return memberService.findByPasswordCheck(memberEntity.getUserEmail(),password);
     }
 
+    @Transactional
     public ResponseEntity<?> withdraw(String userId) {
-        return null;
+        //회원 상태 false로 바꾸기
+        memberRepository.updateMemberStatusByUserId(Long.valueOf(userId),false);
+        //리프레시 토큰 삭제
+        jwtRepository.deleteByMemberEntity_UserId(Long.valueOf(userId));
+        //유저아이디로 프로덕트 물품 리스트 가져오기
+        List<ProductEntity> productEntityList = productRepository.findByMemberEntity_UserId(Long.valueOf(userId));
+        for (ProductEntity productEntity : productEntityList){
+            //리스트의 프로덕트 아이디 가진 스톡 재고 리스트 가져오기
+            //재고 0으로 다 업데이트
+            goodsStockRepository.updateStockQuantityToZeroByProductId(productEntity.getProductId());
+
+        }
+
+        return ResponseEntity.ok("탈퇴가 완료되었습니다.");
     }
 }

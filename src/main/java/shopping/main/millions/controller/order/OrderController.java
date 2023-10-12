@@ -11,7 +11,9 @@ import shopping.main.millions.jwt.TokenProvider;
 import shopping.main.millions.service.order.OrderService;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Log4j2
 @RestController
@@ -36,8 +38,7 @@ public class OrderController {
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
         UserOrderEntity userOrderEntity = orderService.saveUser(orderDto, userId);
-        orderService.saveUserPayment(orderDto , userOrderEntity);
-        return ResponseEntity.ok("200");
+        return orderService.saveUserPayment(orderDto , userOrderEntity);
     }
 
     // 장바구니 선택 상품 주문
@@ -45,6 +46,6 @@ public class OrderController {
     public ResponseEntity<?> orderItems(@RequestBody OrderDto orderDto, HttpServletRequest request) {
         String header = request.getHeader("X-AUTH-TOKEN");
         String userId = tokenProvider.getUserPk(header);
-        return  orderService.orderProcess(orderDto);
+        return  orderService.orderProcess(orderDto,userId);
     }
 }

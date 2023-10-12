@@ -9,7 +9,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @Builder
 @Entity
 @Table(name = "user_order")
@@ -44,4 +44,7 @@ public class UserOrderEntity {
 
     @OneToMany(mappedBy = "userOrderEntity" , cascade = CascadeType.REMOVE , orphanRemoval = true , fetch = FetchType.LAZY)
     private List<OrderPaymentEntity> orderPaymentEntityList;
+
+    @OneToMany(mappedBy = "userOrderEntity", cascade = CascadeType.REMOVE, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<OrderEntity> orderEntityList;
 }

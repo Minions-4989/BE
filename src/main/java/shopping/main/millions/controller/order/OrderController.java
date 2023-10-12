@@ -40,7 +40,7 @@ public class OrderController {
         return ResponseEntity.ok("200");
     }
 
-    //
+    // 장바구니 선택 상품 주문
     @PutMapping("/payment")
     public ResponseEntity<?> orderItems(@RequestBody OrderDto orderDto, HttpServletRequest request) {
         String header = request.getHeader("X-AUTH-TOKEN");

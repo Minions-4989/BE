@@ -6,11 +6,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import shopping.main.millions.dto.product.ProductDto;
+import shopping.main.millions.dto.sales.GoodsImageDto;
 import shopping.main.millions.entity.category.CategoryEntity;
+import shopping.main.millions.entity.product.GoodsImageEntity;
 import shopping.main.millions.entity.product.ProductEntity;
 import shopping.main.millions.repository.product.CategoryRepository;
 import shopping.main.millions.repository.product.ProductRepository;
+import shopping.main.millions.repository.sales.GoodsImageRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -18,14 +23,29 @@ import java.util.Optional;
 public class ProductService {
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
+    private final GoodsImageRepository goodsImageRepository;
 
     public Page<ProductDto> getProductsByPage(Pageable pageable) {
         Page<ProductEntity> products = productRepository.findAll(pageable);
+        List<ProductEntity> productList = products.getContent();
+        //Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productId);
+        //List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
+        List<GoodsImageDto> goodsImageDtos = new ArrayList<>();
+
+//        for (GoodsImageEntity goodsImageEntity: goodsImageEntityList){
+//            GoodsImageDto goodsImageDto = new GoodsImageDto().builder()
+//                    .productImage(goodsImageEntity.getProductImage())
+//                    .productImageOriginName(goodsImageEntity.getProductImageOriginName())
+//                    .productImageSave(goodsImageEntity.getProductImageSave())
+//                    .build();
+//            goodsImageDtos.add(goodsImageDto);
+//        }
+
         Page<ProductDto> productDto = products.map(product -> ProductDto.builder()
                 .productId(product.getProductId())
                 .productName(product.getProductName())
                 .productPrice(product.getProductPrice())
-                .productDate(product.getProductDate())
+                .goodsImageDtoList(goodsImageDtos)
                 .build());
         return productDto;
     }
@@ -43,7 +63,6 @@ public class ProductService {
                     .productId(productEntity.getProductId())
                     .productName(productEntity.getProductName())
                     .productPrice(productEntity.getProductPrice())
-                    .productDate(productEntity.getProductDate())
                     .build();
 
             return ResponseEntity.status(200).body(productDTO);
@@ -66,7 +85,6 @@ public class ProductService {
                     .productId(product.getProductId())
                     .productName(product.getProductName())
                     .productPrice(product.getProductPrice())
-                    .productDate(product.getProductDate())
                     .build());
             return productDtoPage;
         }

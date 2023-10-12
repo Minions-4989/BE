@@ -27,7 +27,7 @@ public class OrderDto {
     private Date orderDate;
 
     // 수령인 정보
-    private String telNumber;
+    private String tellNumber;
 
     private String userName;
 

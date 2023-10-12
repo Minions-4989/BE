@@ -149,7 +149,7 @@ public class CartService {
             // Dto 변환
             for (CartProductEntity cartProductEntity : cartProducts) {
 
-                Long productId =cartProductEntity.getProductEntity().getProductId();
+                Long productId = cartProductEntity.getProductEntity().getProductId();
                 Optional<List<GoodsImageEntity>> goodsImageById = goodsImageRepository.findGoodsImageEntitiesByProductEntity_ProductId(productId);
                 List<GoodsImageEntity> goodsImageEntityList = goodsImageById.get();
                 List<GoodsImageDto> goodsImageDtos = new ArrayList<>();

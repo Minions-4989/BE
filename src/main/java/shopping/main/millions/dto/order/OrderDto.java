@@ -14,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OrderDto {
+    //해당 주문 번호
+    private Long userOrderId;
 
     // 결제 정보
     private String cardNum; // 카드 번호
